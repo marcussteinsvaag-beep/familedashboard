@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Familiedashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0f18;
+  --s1: #141720;
+  --s2: #1a1e2e;
+  --s3: #222840;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.1);
+  --text: #e2e4f0;
+  --muted: #6b7099;
+  --muted2: #9099c0;
+  --accent: #4f7ef8;
+  --accent2: #8b6ff7;
+  --warm: #f5a054;
+  --cold: #54c4f5;
+  --green: #3dd68c;
+  --red: #f56b6b;
+  --yellow: #f5c842;
+  --pink: #f568a8;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ---- NIGHT MODE ---- */
+body.night-mode { filter: brightness(0.12); transition: filter 2s ease; }
+body.night-mode.night-awake { filter: brightness(1); transition: filter 0.4s ease; }
+
+body.night-mode .night-clock {
+  filter: brightness(8);
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Serif Display', serif;
+  font-size: 120px;
+  color: rgba(255,255,255,0.15);
+  pointer-events: none;
+  z-index: 100;
+}
+
+body.night-mode.night-awake .night-clock { display: none !important; }
+
+.night-clock { display: none; }
+
+/* Wake button */
+.wake-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 30px;
+  color: rgba(255,255,255,0.4);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 10px 24px;
+  cursor: pointer;
+  display: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.wake-btn:hover { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); }
+body.night-mode .wake-btn { display: block; }
+body.night-mode.night-awake .wake-btn { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.25); }
+
+/* ---- LAYOUT ---- */
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  grid-template-rows: auto auto 1fr;
+  gap: 16px;
+  padding: 24px;
+  min-height: 100vh;
+}
+
+/* ---- TOP BAR ---- */
+.topbar {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: start;
+}
+
+.clock-block { }
+
+.clock {
+  font-family: 'DM Serif Display', serif;
+  font-size: 80px;
+  line-height: 1;
+  letter-spacing: -3px;
+  background: linear-gradient(135deg, #e2e4f0 0%, #8090c8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.datestr {
+  font-size: 14px;
+  color: var(--muted2);
+  margin-top: 4px;
+  text-transform: capitalize;
+  letter-spacing: 0.05em;
+}
+
+.location-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--s2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 5px 13px 5px 9px;
+  font-size: 12px;
+  color: var(--muted2);
+  margin-top: 8px;
+  cursor: default;
+}
+
+.loc-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  flex-shrink: 0;
+  transition: background 0.5s;
+}
+
+/* WHO IS WHERE */
+.who-where {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.who-title {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 2px;
+}
+
+.person-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px 5px 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.person-row:hover { border-color: var(--border2); background: var(--s2); }
+
+.person-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.person-name { font-size: 13px; color: var(--text); }
+.person-status { font-size: 12px; margin-left: 2px; }
+
+/* BIRTHDAY BANNER */
+.birthday-banner {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, var(--s2), var(--s3));
+  border: 1px solid rgba(245, 200, 66, 0.3);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%,100% { border-color: rgba(245,200,66,0.3); }
+  50% { border-color: rgba(245,200,66,0.7); }
+}
+
+.birthday-icon { font-size: 28px; }
+.birthday-text { flex: 1; }
+.birthday-text strong { font-size: 15px; font-weight: 500; color: var(--yellow); display: block; }
+.birthday-text span { font-size: 13px; color: var(--muted2); }
+
+/* COMMUTE CARD */
+.commute-card {
+  grid-column: 1 / -1;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.commute-icon { font-size: 22px; flex-shrink: 0; }
+
+.commute-route {
+  flex: 1;
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.route-stop {
+  font-size: 12px;
+  color: var(--muted2);
+}
+
+.route-arrow { color: var(--muted); font-size: 10px; }
+
+.commute-time {
+  font-family: 'DM Serif Display', serif;
+  font-size: 42px;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.commute-time.fast { color: var(--green); }
+.commute-time.medium { color: var(--yellow); }
+.commute-time.slow { color: var(--red); }
+
+.commute-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.commute-tip {
+  font-size: 13px;
+  color: var(--warm);
+  background: rgba(245,160,84,0.1);
+  border: 1px solid rgba(245,160,84,0.2);
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin-top: 4px;
+}
+
+/* MAIN CONTENT */
+.main-left { display: flex; flex-direction: column; gap: 16px; }
+.main-right { display: flex; flex-direction: column; gap: 16px; }
+
+/* CARD BASE */
+.card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* CALENDAR */
+.cal-body { padding: 0 20px; }
+
+.day-group {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.day-group:last-child { border-bottom: none; }
+
+.day-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.day-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--muted2);
+  min-width: 30px;
+}
+
+.day-num.today { color: var(--accent); }
+
+.day-name {
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.today-chip {
+  font-size: 10px;
+  font-weight: 500;
+  background: var(--accent);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.06em;
+}
+
+.event {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: background 0.15s;
+  position: relative;
+}
+
+.event:hover { background: var(--s2); }
+
+.event-bar {
+  width: 3px;
+  border-radius: 2px;
+  min-height: 18px;
+  align-self: stretch;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.event-time {
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 36px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-feature-settings: "tnum";
+}
+
+.event-content { flex: 1; }
+.event-name { font-size: 13px; color: var(--text); line-height: 1.3; }
+.event-location { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.event-project-btn {
+  background: none;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 11px;
+  padding: 2px 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.event-project-btn:hover { background: rgba(79,126,248,0.1); }
+
+.away-tip {
+  font-size: 11px;
+  color: var(--warm);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.no-events { font-size: 12px; color: var(--muted); padding: 4px 10px; font-style: italic; }
+
+/* WEATHER */
+.weather-now {
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.w-temp {
+  font-family: 'DM Serif Display', serif;
+  font-size: 60px;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.w-details { padding-bottom: 4px; }
+.w-desc { font-size: 14px; color: var(--muted2); margin-bottom: 4px; }
+.w-meta { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 2px; }
+
+.forecast { padding: 12px 20px; }
+
+.fc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.fc-row:last-child { border-bottom: none; }
+.fc-day { color: var(--muted); min-width: 32px; text-transform: capitalize; }
+.fc-icon { font-size: 16px; }
+.fc-rain { color: var(--cold); font-size: 11px; min-width: 40px; text-align: center; }
+.fc-temps { display: flex; gap: 6px; }
+.fc-max { font-weight: 500; color: var(--warm); }
+.fc-min { color: var(--muted); }
+
+/* DINNER */
+.dinner-card { }
+
+.dinner-week {
+  display: flex;
+  padding: 12px 16px;
+  gap: 6px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+}
+
+.dinner-day {
+  flex: 1;
+  min-width: 56px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  position: relative;
+}
+
+.dinner-day.today { border-color: var(--accent); }
+.dinner-day:hover { border-color: var(--border2); }
+
+.dd-name { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.dd-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+.dd-meal { font-size: 10px; color: var(--muted2); line-height: 1.2; }
+.dd-empty { font-size: 18px; color: var(--s3); }
+
+.dinner-votes { display: flex; gap: 4px; justify-content: center; margin-top: 4px; }
+.vote-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 1px 3px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  color: var(--muted);
+}
+.vote-btn:hover { background: var(--s3); }
+.vote-btn.active { color: var(--text); }
+.vote-count { font-size: 9px; color: var(--muted); }
+
+.dinner-edit {
+  padding: 12px 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.dinner-input {
+  flex: 1;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.dinner-input:focus { border-color: var(--accent); }
+.dinner-input::placeholder { color: var(--muted); }
+
+.btn-small {
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.2s;
+}
+
+.btn-small:hover { opacity: 0.85; }
+
+/* EVENING ROUTINE */
+.routine-card { }
+
+.routine-list { padding: 8px 16px 16px; }
+
+.routine-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.routine-item:last-child { border-bottom: none; }
+
+.routine-time {
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 36px;
+  font-feature-settings: "tnum";
+}
+
+.routine-icon { font-size: 18px; flex-shrink: 0; }
+
+.routine-text { flex: 1; }
+.routine-who { font-size: 11px; color: var(--muted); }
+.routine-what { font-size: 13px; color: var(--text); }
+
+.routine-countdown {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: var(--s2);
+  color: var(--muted2);
+  flex-shrink: 0;
+}
+
+.routine-countdown.soon { background: rgba(245,107,107,0.15); color: var(--red); }
+.routine-countdown.now { background: rgba(245,107,107,0.3); color: var(--red); animation: blink 1s ease-in-out infinite; }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* EVENING CHECKLIST */
+.checklist { padding: 12px 16px 16px; }
+
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.check-item:last-child { border-bottom: none; }
+
+.check-box {
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  font-size: 12px;
+}
+
+.check-item.done .check-box {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.check-label { font-size: 13px; color: var(--text); }
+.check-item.done .check-label { color: var(--muted); text-decoration: line-through; }
+
+/* COUNTDOWN */
+.countdown-card {
+  background: linear-gradient(135deg, var(--s1), var(--s2));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cd-icon { font-size: 32px; }
+.cd-text { flex: 1; }
+.cd-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px; }
+.cd-destination { font-size: 15px; color: var(--text); font-weight: 500; margin-bottom: 1px; }
+.cd-sub { font-size: 12px; color: var(--muted2); }
+.cd-days {
+  font-family: 'DM Serif Display', serif;
+  font-size: 52px;
+  color: var(--accent2);
+  line-height: 1;
+  letter-spacing: -2px;
+}
+.cd-days-label { font-size: 11px; color: var(--muted); text-align: center; }
+
+/* PROJECT MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--s1);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 24px;
+  width: min(480px, 90vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: translateY(20px);
+  transition: transform 0.2s;
+}
+
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal-title { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+.modal-sub { font-size: 13px; color: var(--muted2); margin-bottom: 20px; }
+.modal-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted2);
+  font-size: 14px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.modal-section { margin-bottom: 20px; }
+.modal-section-title {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+
+.project-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.project-check:last-child { border-bottom: none; }
+
+/* SHOPPING LIST */
+.shop-list { padding: 8px 16px; }
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.shop-item:last-child { border-bottom: none; }
+.shop-item.done .shop-label { color: var(--muted); text-decoration: line-through; }
+
+.shop-add {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px 14px;
+}
+
+.shop-input {
+  flex: 1;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+}
+
+.shop-input:focus { border-color: var(--accent); }
+.shop-input::placeholder { color: var(--muted); }
+
+/* MORNING REMINDER */
+.morning-reminder {
+  background: linear-gradient(135deg, rgba(79,126,248,0.08), rgba(139,111,247,0.08));
+  border: 1px solid rgba(79,126,248,0.2);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.mr-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+.mr-text { }
+.mr-title { font-size: 13px; font-weight: 500; color: var(--accent); margin-bottom: 4px; }
+.mr-items { }
+.mr-item { font-size: 13px; color: var(--muted2); padding: 1px 0; display: flex; align-items: center; gap: 6px; }
+
+/* STATUS */
+.cal-status { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+.status-dot.err { background: var(--red); }
+
+/* SETUP NOTICE */
+.setup-notice {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--muted2);
+  line-height: 1.6;
+  margin: 12px 16px;
+}
+
+.setup-notice strong { color: var(--text); }
+.setup-notice code {
+  background: var(--bg);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--accent);
+}
+
+/* SECTION HIDE/SHOW */
+.hidden { display: none !important; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .dashboard { grid-template-columns: 1fr; padding: 16px; }
+  .topbar { grid-template-columns: 1fr; }
+  .who-where { align-items: flex-start; }
+  .clock { font-size: 60px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NIGHT CLOCK (only shown in night mode) -->
+<div class="night-clock" id="night-clock">00:00</div>
+
+<!-- WAKE BUTTON -->
+<button class="wake-btn" id="wake-btn" onclick="wakeScreen()">👆 Trykk for å vekke skjermen</button>
+
+<!-- PROJECT MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeModalBtn()">Lukk</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<div class="dashboard">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="clock-block">
+      <div class="clock" id="clock">00:00</div>
+      <div class="datestr" id="datestr">mandag, 1. januar</div>
+      <div class="location-pill">
+        <span class="loc-dot" id="loc-dot"></span>
+        <span id="loc-name">Haslum</span>
+      </div>
+    </div>
+
+    <div></div>
+
+    <div class="who-where">
+      <div class="who-title">Hvem er hvor</div>
+      <div id="who-list"></div>
+    </div>
+  </div>
+
+  <!-- BIRTHDAY BANNER -->
+  <div class="birthday-banner hidden" id="birthday-banner">
+    <div class="birthday-icon">🎂</div>
+    <div class="birthday-text">
+      <strong id="birthday-name">–</strong>
+      <span id="birthday-msg">–</span>
+    </div>
+  </div>
+
+  <!-- COMMUTE (weekdays only) -->
+  <div class="commute-card hidden" id="commute-card">
+    <div class="commute-icon">🚗</div>
+    <div style="flex:1">
+      <div class="commute-route">
+        <span class="route-stop">Vestliveien 20B</span>
+        <span class="route-arrow">›</span>
+        <span class="route-stop">Haslum skole</span>
+        <span class="route-arrow">›</span>
+        <span class="route-stop">Innspurten 15</span>
+      </div>
+      <div id="commute-tip" class="commute-tip hidden"></div>
+    </div>
+    <div>
+      <div class="commute-time" id="commute-time">–</div>
+      <div class="commute-meta" id="commute-meta">Henter…</div>
+    </div>
+  </div>
+
+  <!-- MORNING REMINDER -->
+  <div class="morning-reminder hidden" id="morning-reminder">
+    <div class="mr-icon">☀️</div>
+    <div class="mr-text">
+      <div class="mr-title">I dag bør dere huske</div>
+      <div class="mr-items" id="morning-items"></div>
+    </div>
+  </div>
+
+  <!-- MAIN LEFT -->
+  <div class="main-left">
+
+    <!-- CALENDAR -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Familiekalender</div>
+        <div class="cal-status">
+          <span class="status-dot" id="cal-dot"></span>
+          <span id="cal-status-txt">Laster…</span>
+        </div>
+      </div>
+      <div class="cal-body" id="cal-body">
+        <div class="setup-notice">Laster kalender…</div>
+      </div>
+    </div>
+
+    <!-- DINNER -->
+    <div class="card dinner-card">
+      <div class="card-header">
+        <div class="card-title">Ukens middag</div>
+        <div style="font-size:12px;color:var(--muted)">Trykk for å redigere</div>
+      </div>
+      <div class="dinner-week" id="dinner-week"></div>
+      <div class="dinner-edit" id="dinner-edit" style="display:none">
+        <input class="dinner-input" id="dinner-input" placeholder="Hva er til middag? (f.eks. Taco 🌮)" />
+        <button class="btn-small" onclick="saveDinner()">Lagre</button>
+      </div>
+    </div>
+
+    <!-- COUNTDOWN -->
+    <div class="countdown-card hidden" id="countdown-card">
+      <div class="cd-icon" id="cd-icon">🌊</div>
+      <div class="cd-text">
+        <div class="cd-label">Nedtelling</div>
+        <div class="cd-destination" id="cd-dest">–</div>
+        <div class="cd-sub" id="cd-sub">–</div>
+      </div>
+      <div>
+        <div class="cd-days" id="cd-days">–</div>
+        <div class="cd-days-label">dager</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MAIN RIGHT -->
+  <div class="main-right">
+
+    <!-- WEATHER -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title" id="weather-title">Vær – Haslum</div>
+      </div>
+      <div class="weather-now">
+        <div class="w-temp" id="w-temp">–°</div>
+        <div class="w-details">
+          <div class="w-desc" id="w-desc">Henter…</div>
+          <div class="w-meta">
+            <span id="w-wind">–</span>
+            <span id="w-rain">–</span>
+            <span id="w-feels">–</span>
+          </div>
+        </div>
+      </div>
+      <div class="forecast" id="forecast-body"></div>
+    </div>
+
+    <!-- SHOPPING LIST -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Handleliste</div>
+        <div style="font-size:11px;color:var(--muted)">Trykk for å huke av</div>
+      </div>
+      <div class="shop-list" id="shop-list"></div>
+      <div class="shop-add">
+        <input class="shop-input" id="shop-input" placeholder="Legg til vare…" onkeydown="if(event.key==='Enter')addShopItem()" />
+        <button class="btn-small" onclick="addShopItem()">+</button>
+      </div>
+    </div>
+
+    <!-- EVENING ROUTINE (shown after 19:30) -->
+    <div class="card routine-card hidden" id="routine-card">
+      <div class="card-header">
+        <div class="card-title">Kveldsrutine</div>
+        <div style="font-size:11px;color:var(--muted)" id="routine-mode">Hverdag</div>
+      </div>
+      <div class="routine-list" id="routine-list"></div>
+    </div>
+
+    <!-- EVENING CHECKLIST (weekday evenings) -->
+    <div class="card hidden" id="checklist-card">
+      <div class="card-header">
+        <div class="card-title">Klart til i morgen?</div>
+      </div>
+      <div class="checklist" id="checklist-body"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// KONFIGURASJON
+// ============================================================
+const GOOGLE_API_KEY = '';
+const CALENDAR_ID    = '';
+const DAYS_AHEAD     = 7;
+
+// Ruter for kjøretid
+const COMMUTE_ORIGIN      = 'Vestliveien+20B,Bærum,Norway';
+const COMMUTE_WAYPOINT    = 'Haslum+skole,Bærum,Norway';
+const COMMUTE_DESTINATION = 'Innspurten+15,0663+Oslo,Norway';
+const COMMUTE_NORMAL_MIN  = 20; // Normaltid i minutter
+
+// Steder med koordinater (Yr.no)
+const LOCATIONS = {
+  default: { name: 'Haslum',        lat: 59.9181, lon: 10.5311, icon: '🏠' },
+  tjome:   { name: 'Tjøme',         lat: 59.1167, lon: 10.4167, icon: '⛵' },
+  elgasen: { name: 'Elgåsen',       lat: 60.8580, lon: 10.8450, icon: '⛷️' },
+  favang:  { name: 'Fåvangfjellet', lat: 61.4560, lon: 10.2210, icon: '🏔️' },
+};
+
+const LOCATION_KEYWORDS = {
+  tjome:   ['tjøme','tjome','sommerhytt','seiltur'],
+  elgasen: ['elgåsen','elgasen','sjusjøen','ringsaker','fjellhytt'],
+  favang:  ['fåvang','favang','sportskapell'],
+};
+
+// Bursdager – legg til familie og venner her
+const BIRTHDAYS = [
+  { name: 'Farmor',           date: '03-15', relation: 'familie', emoji: '👵' },
+  { name: 'Morfar',           date: '07-08', relation: 'familie', emoji: '👴' },
+  { name: 'Alvar',            date: '06-12', relation: 'familie', emoji: '⚽' },
+  { name: 'Ovidia',           date: '09-22', relation: 'familie', emoji: '🎵' },
+  { name: 'Edvald',           date: '03-01', relation: 'familie', emoji: '🚂' },
+  // Legg til vennefamilier her:
+  // { name: 'Erik og Annes Sofie', date: '04-20', relation: 'venn', emoji: '🎈' },
+];
+
+// Hvem er hvor – statuser (oppdater manuelt eller koble til kalender)
+const FAMILY = [
+  { name: 'Marcus',  initials: 'M', color: '#4f7ef8', defaultStatus: '🏢', defaultPlace: 'Jobb' },
+  { name: 'Ragnhild',initials: 'R', color: '#8b6ff7', defaultStatus: '🏠', defaultPlace: 'Hjemme' },
+  { name: 'Alvar',   initials: 'A', color: '#3dd68c', defaultStatus: '🏫', defaultPlace: 'Skole' },
+  { name: 'Ovidia',  initials: 'O', color: '#f568a8', defaultStatus: '🏫', defaultPlace: 'Skole' },
+  { name: 'Edvald',  initials: 'E', color: '#f5a054', defaultStatus: '🏫', defaultPlace: 'Barnehage' },
+];
+
+// Kveldsrutiner – hverdag (kan lage helg-variant)
+const ROUTINES_WEEKDAY = [
+  { time: '19:30', who: 'Alle',    icon: '🍽️', what: 'Tid for kveldsmat' },
+  { time: '20:00', who: 'Edvald',  icon: '🛁', what: 'Bad og tannpuss' },
+  { time: '20:15', who: 'Edvald',  icon: '📖', what: 'Legging' },
+  { time: '20:30', who: 'Ovidia',  icon: '🦷', what: 'Tannpuss' },
+  { time: '21:00', who: 'Ovidia',  icon: '📚', what: 'Legging' },
+  { time: '21:30', who: 'Alvar',   icon: '📵', what: 'Skjermfri tid' },
+  { time: '22:00', who: 'Alvar',   icon: '💤', what: 'Legging' },
+  { time: '22:00', who: 'Voksne',  icon: '🍷', what: 'Ro og fred 🎉' },
+];
+
+const ROUTINES_WEEKEND = [
+  { time: '20:00', who: 'Edvald',  icon: '🛁', what: 'Bad og tannpuss' },
+  { time: '20:30', who: 'Edvald',  icon: '📖', what: 'Legging' },
+  { time: '21:00', who: 'Ovidia',  icon: '🦷', what: 'Tannpuss og legging' },
+  { time: '22:30', who: 'Alvar',   icon: '💤', what: 'Legging' },
+  { time: '22:30', who: 'Voksne',  icon: '🍷', what: 'Ro og fred 🎉' },
+];
+
+// Prosjektkort
+const PROJECTS = {
+  tjome: {
+    title: '⛵ Båtpuss – Tjøme',
+    sub: 'Hva skal gjøres og handles inn?',
+    checklist: [
+      'Vaske skrog innvendig og utvendig',
+      'Polere og vokse',
+      'Sjekke motor og olje',
+      'Teste navigasjonslys',
+      'Sjekke redningsutstyr',
+      'Montere bimini og fortelt',
+    ],
+    shopping: [
+      'Båtvoks',
+      'Rengjøringsmiddel',
+      'Motorolje',
+      'Papir og kluter',
+      'Proviant for første helg',
+    ]
+  },
+  elgasen: {
+    title: '⛷️ Åpning fjellhytta – Elgåsen',
+    sub: 'Huskeliste og innkjøp',
+    checklist: [
+      'Lufte hytta (åpne vinduer 30 min)',
+      'Sjekke vann og avløp',
+      'Skredde og smøre ski',
+      'Sjekke føreforhold og løyper',
+      'Tenne i peisen',
+    ],
+    shopping: [
+      'Proviant for helgen',
+      'Ski-glider',
+      'Elektrisk tennvæske',
+      'Melk, brød og egg',
+    ]
+  },
+  favang: {
+    title: '🏔️ Fåvangfjellet sportskapell',
+    sub: 'Huskeliste',
+    checklist: [
+      'Pakke skiutstyr',
+      'Sjekke klær til alle',
+      'Lage matpakker',
+    ],
+    shopping: [
+      'Proviant',
+      'Snacks til bilturen',
+    ]
+  }
+};
+
+// ============================================================
+// DATA / TILSTAND
+// ============================================================
+const DAY_NO   = ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
+const DAY_SH   = ['Søn','Man','Tir','Ons','Tor','Fre','Lør'];
+const MONTH_NO = ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+
+const YR_ICONS = {
+  clearsky_day:'☀️',clearsky_night:'🌙',fair_day:'🌤️',fair_night:'🌤️',
+  partlycloudy_day:'⛅',partlycloudy_night:'⛅',cloudy:'☁️',
+  lightrainshowers_day:'🌦️',rainshowers_day:'🌧️',heavyrainshowers_day:'⛈️',
+  lightrainshowers_night:'🌦️',rainshowers_night:'🌧️',
+  lightrain:'🌦️',rain:'🌧️',heavyrain:'🌧️',
+  snowshowers_day:'🌨️',snowshowers_night:'🌨️',
+  snow:'❄️',lightsnow:'🌨️',heavysnow:'❄️',
+  sleet:'🌨️',lightsleet:'🌧️',fog:'🌫️',
+  thunder:'⛈️',heavyrainandthunder:'⛈️',
+};
+
+const YR_DESC = {
+  clearsky_day:'Klarvær',clearsky_night:'Klarvær',fair_day:'Lettskyet',fair_night:'Lettskyet',
+  partlycloudy_day:'Delvis skyet',partlycloudy_night:'Delvis skyet',cloudy:'Overskyet',
+  lightrain:'Lett regn',rain:'Regn',heavyrain:'Kraftig regn',
+  lightrainshowers_day:'Regnbyger',rainshowers_day:'Regnbyger',heavyrainshowers_day:'Kraftige byger',
+  lightrainshowers_night:'Regnbyger',rainshowers_night:'Regnbyger',
+  snow:'Snø',lightsnow:'Lett snø',heavysnow:'Kraftig snø',
+  sleet:'Sludd',fog:'Tåke',thunder:'Torden',
+  snowshowers_day:'Snøbyger',snowshowers_night:'Snøbyger',
+};
+
+const EVENT_COLORS = ['#4f7ef8','#8b6ff7','#f5a054','#3dd68c','#f56b6b','#54c4f5','#f568a8','#f5c842'];
+
+function windDir(deg) {
+  return ['N','NØ','Ø','SØ','S','SV','V','NV'][Math.round(deg/45)%8];
+}
+
+// State
+let currentEvents = [];
+let currentLoc = LOCATIONS.default;
+let selectedDinnerDay = null;
+let projectStates = JSON.parse(localStorage.getItem('projectStates')||'{}');
+let shopItems = JSON.parse(localStorage.getItem('shopItems')||'[]');
+let dinnerData = JSON.parse(localStorage.getItem('dinnerData')||'{}');
+let dinnerVotes = JSON.parse(localStorage.getItem('dinnerVotes')||'{}');
+let checklistData = JSON.parse(localStorage.getItem('checklistData')||'{}');
+let whoStatus = JSON.parse(localStorage.getItem('whoStatus')||'{}');
+
+// ============================================================
+// CLOCK
+// ============================================================
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const clockEl = document.getElementById('clock');
+  const nightEl = document.getElementById('night-clock');
+  if (clockEl) clockEl.textContent = `${h}:${m}`;
+  if (nightEl) nightEl.textContent = `${h}:${m}`;
+
+  document.getElementById('datestr').textContent =
+    `${DAY_NO[now.getDay()]}, ${now.getDate()}. ${MONTH_NO[now.getMonth()]}`;
+
+  handleTimeBasedVisibility(now);
+}
+
+function handleTimeBasedVisibility(now) {
+  const hour = now.getHours();
+  const min = now.getMinutes();
+  const totalMin = hour * 60 + min;
+  const isWeekday = now.getDay() >= 1 && now.getDay() <= 5;
+  const isWeekend = !isWeekday;
+
+  // Night mode 22:00–06:00
+  const isNight = hour >= 22 || hour < 6;
+  document.body.classList.toggle('night-mode', isNight);
+  document.getElementById('night-clock').style.display = isNight ? 'flex' : 'none';
+
+  // Commute: weekdays 06:00–09:30
+  const showCommute = isWeekday && totalMin >= 360 && totalMin <= 570;
+  document.getElementById('commute-card').classList.toggle('hidden', !showCommute);
+
+  // Morning reminder: weekdays 06:00–09:00
+  const showMorning = isWeekday && totalMin >= 360 && totalMin <= 540;
+  updateMorningReminder(showMorning, now);
+
+  // Evening routine: after 19:30
+  const showRoutine = totalMin >= 1170;
+  document.getElementById('routine-card').classList.toggle('hidden', !showRoutine);
+  if (showRoutine) renderRoutine(now, isWeekend);
+
+  // Evening checklist: weekday evenings 20:00–23:00, check if tomorrow is schoolday
+  const tomorrowDay = (now.getDay() + 1) % 7;
+  const tomorrowIsSchool = tomorrowDay >= 1 && tomorrowDay <= 5;
+  const showChecklist = tomorrowIsSchool && totalMin >= 1200 && totalMin <= 1380;
+  document.getElementById('checklist-card').classList.toggle('hidden', !showChecklist);
+  if (showChecklist) renderChecklist(now);
+}
+
+// ============================================================
+// WHO IS WHERE
+// ============================================================
+function renderWhoWhere() {
+  const isWeekday = new Date().getDay() >= 1 && new Date().getDay() <= 5;
+  const hour = new Date().getHours();
+
+  const list = document.getElementById('who-list');
+  list.innerHTML = FAMILY.map(p => {
+    const saved = whoStatus[p.name];
+    let status = saved ? saved.icon : p.defaultStatus;
+    let place  = saved ? saved.place : (isWeekday && hour >= 8 && hour < 16 ? p.defaultPlace : 'Hjemme');
+
+    return `<div class="person-row" onclick="cycleStatus('${p.name}')">
+      <div class="person-avatar" style="background:${p.color}22;color:${p.color}">${p.initials}</div>
+      <span class="person-name">${p.name}</span>
+      <span class="person-status">${status}</span>
+    </div>`;
+  }).join('');
+}
+
+const STATUS_CYCLE = [
+  { icon: '🏠', place: 'Hjemme' },
+  { icon: '🏢', place: 'Jobb/Skole' },
+  { icon: '⚽', place: 'Trening' },
+  { icon: '🏥', place: 'Lege' },
+  { icon: '🛒', place: 'Butikk' },
+  { icon: '✈️', place: 'Reise' },
+  { icon: '🌊', place: 'Tjøme' },
+  { icon: '⛷️', place: 'Fjellet' },
+];
+
+function cycleStatus(name) {
+  const current = whoStatus[name];
+  const idx = current ? STATUS_CYCLE.findIndex(s => s.icon === current.icon) : -1;
+  const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
+  whoStatus[name] = next;
+  localStorage.setItem('whoStatus', JSON.stringify(whoStatus));
+  renderWhoWhere();
+}
+
+// ============================================================
+// BIRTHDAYS
+// ============================================================
+function checkBirthdays() {
+  const now = new Date();
+  const todayMD = `${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
+  for (const b of BIRTHDAYS) {
+    const bDate = new Date(`${now.getFullYear()}-${b.date}`);
+    const diff = Math.ceil((bDate - now) / 86400000);
+
+    if (diff <= 3 && diff >= 0) {
+      const banner = document.getElementById('birthday-banner');
+      banner.classList.remove('hidden');
+      const age = b.year ? (now.getFullYear() - b.year + (diff === 0 ? 0 : 1)) : null;
+      const ageStr = age ? ` fyller ${age} år` : '';
+      document.getElementById('birthday-name').textContent =
+        `${b.emoji} ${b.name}${ageStr}${diff === 0 ? ' I DAG! 🎉' : ''}`;
+      document.getElementById('birthday-msg').textContent =
+        diff === 0 ? 'Husk å gratulere!' :
+        diff === 1 ? 'Bursdag i morgen – husk gave og melding!' :
+        `Bursdag om ${diff} dager`;
+      break;
+    }
+  }
+}
+
+// ============================================================
+// MORNING REMINDER
+// ============================================================
+function updateMorningReminder(show, now) {
+  const el = document.getElementById('morning-reminder');
+  if (!show) { el.classList.add('hidden'); return; }
+
+  const items = [];
+  const todayEvents = currentEvents.filter(e => {
+    const start = e.start?.dateTime || e.start?.date || '';
+    return start.startsWith(now.toISOString().slice(0,10));
+  });
+
+  for (const ev of todayEvents) {
+    const title = (ev.summary || '').toLowerCase();
+    if (title.includes('fotball') || title.includes('trening')) {
+      const name = title.includes('j2013') || title.includes('alvar') ? 'Alvar' :
+                   title.includes('ovidia') ? 'Ovidia' :
+                   title.includes('edvald') ? 'Edvald' : '';
+      items.push(`⚽ Husk fotballutstyr${name ? ' til ' + name : ''}`);
+    }
+    if (title.includes('korps') || title.includes('musikk')) {
+      items.push('🎺 Husk instrument og noter til Alvar');
+    }
+    if (title.includes('klassetur') || title.includes('tur')) {
+      items.push('🎒 Sjekk pakkeliste for turen');
+    }
+  }
+
+  // Weather-based reminders
+  const wTemp = parseInt(document.getElementById('w-temp').textContent) || 10;
+  const wDesc = document.getElementById('w-desc').textContent.toLowerCase();
+  if (wDesc.includes('regn') || wDesc.includes('byger')) {
+    items.push('☂️ Regnjakke til barna');
+  }
+  if (wTemp < 2) {
+    items.push('🧤 Votter og lue til alle');
+  }
+
+  if (items.length === 0) {
+    el.classList.add('hidden');
+    return;
+  }
+
+  el.classList.remove('hidden');
+  document.getElementById('morning-items').innerHTML =
+    items.map(i => `<div class="mr-item">· ${i}</div>`).join('');
+}
+
+// ============================================================
+// EVENING ROUTINE
+// ============================================================
+function renderRoutine(now, isWeekend) {
+  const routines = isWeekend ? ROUTINES_WEEKEND : ROUTINES_WEEKDAY;
+  document.getElementById('routine-mode').textContent = isWeekend ? 'Helg' : 'Hverdag';
+
+  const totalMin = now.getHours() * 60 + now.getMinutes();
+
+  const html = routines.map(r => {
+    const [rh, rm] = r.time.split(':').map(Number);
+    const rMin = rh * 60 + rm;
+    const diff = rMin - totalMin;
+
+    let cdClass = '';
+    let cdText = r.time;
+
+    if (diff < 0) {
+      cdText = 'Ferdig';
+      cdClass = '';
+    } else if (diff <= 10) {
+      cdText = `${diff} min`;
+      cdClass = 'now';
+    } else if (diff <= 30) {
+      cdText = `${diff} min`;
+      cdClass = 'soon';
+    }
+
+    return `<div class="routine-item">
+      <span class="routine-time">${r.time}</span>
+      <span class="routine-icon">${r.icon}</span>
+      <div class="routine-text">
+        <div class="routine-who">${r.who}</div>
+        <div class="routine-what">${r.what}</div>
+      </div>
+      <span class="routine-countdown ${cdClass}">${cdText}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('routine-list').innerHTML = html;
+}
+
+// ============================================================
+// EVENING CHECKLIST
+// ============================================================
+function renderChecklist(now) {
+  const dateKey = now.toISOString().slice(0,10);
+  const saved = checklistData[dateKey] || {};
+
+  // Dynamic: check if Alvar has activity tomorrow
+  const tomorrow = new Date(now.getTime() + 86400000).toISOString().slice(0,10);
+  const tomorrowEvents = currentEvents.filter(e => {
+    const start = e.start?.dateTime || e.start?.date || '';
+    return start.startsWith(tomorrow);
+  });
+
+  const items = [
+    { id: 'oppvask', label: '🍽️ Tøm oppvaskmaskinen' },
+    { id: 'matboks-alvar', label: '🥪 Matboks til Alvar' },
+    { id: 'matboks-ovidia', label: '🥪 Matboks til Ovidia' },
+    { id: 'vannflasker', label: '💧 Vannflasker x3' },
+  ];
+
+  for (const ev of tomorrowEvents) {
+    const t = (ev.summary || '').toLowerCase();
+    if (t.includes('fotball') || t.includes('trening')) {
+      items.push({ id: 'treningsbag', label: '⚽ Treningsbag og drakt til Alvar' });
+    }
+    if (t.includes('korps')) {
+      items.push({ id: 'korps', label: '🎺 Instrument og noter til Alvar' });
+    }
+  }
+
+  document.getElementById('checklist-body').innerHTML = items.map(item => {
+    const done = saved[item.id] || false;
+    return `<div class="check-item${done ? ' done' : ''}" onclick="toggleCheck('${dateKey}','${item.id}',this)">
+      <div class="check-box">${done ? '✓' : ''}</div>
+      <span class="check-label">${item.label}</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleCheck(dateKey, itemId, el) {
+  if (!checklistData[dateKey]) checklistData[dateKey] = {};
+  checklistData[dateKey][itemId] = !checklistData[dateKey][itemId];
+  localStorage.setItem('checklistData', JSON.stringify(checklistData));
+  el.classList.toggle('done');
+  const box = el.querySelector('.check-box');
+  box.textContent = checklistData[dateKey][itemId] ? '✓' : '';
+}
+
+// ============================================================
+// WEATHER
+// ============================================================
+async function fetchWeather(loc) {
+  currentLoc = loc;
+  document.getElementById('weather-title').textContent = `Vær – ${loc.name}`;
+  document.getElementById('loc-name').textContent = `${loc.icon || ''} ${loc.name}`;
+
+  try {
+    const res = await fetch(
+      `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${loc.lat}&lon=${loc.lon}`,
+      { headers: { 'User-Agent': 'FamiliedashboardHaslum/1.0 privat' } }
+    );
+    if (!res.ok) throw new Error('Yr ' + res.status);
+    const data = await res.json();
+    renderWeather(data);
+  } catch(e) {
+    document.getElementById('w-desc').textContent = 'Vær utilgjengelig';
+    console.error(e);
+  }
+}
+
+function renderWeather(data) {
+  const ts = data.properties.timeseries;
+  const now = ts[0];
+  const d = now.data.instant.details;
+  const sym = now.data.next_1_hours?.summary?.symbol_code || now.data.next_6_hours?.summary?.symbol_code || 'cloudy';
+  const symBase = sym.replace(/_day|_night|_polartwilight/,'');
+
+  const temp = Math.round(d.air_temperature);
+  const wind = Math.round(d.wind_speed);
+  const precip = now.data.next_1_hours?.details?.precipitation_amount ?? 0;
+  const feels = Math.round(d.air_temperature - d.wind_speed * 0.7);
+
+  document.getElementById('w-temp').textContent = `${temp}°`;
+  document.getElementById('w-desc').textContent = YR_DESC[symBase] || symBase;
+  document.getElementById('w-wind').textContent = `💨 ${wind} m/s ${windDir(d.wind_from_direction)}`;
+  document.getElementById('w-rain').textContent = precip > 0 ? `🌧 ${precip.toFixed(1)} mm/t` : '☁️ Tørt';
+  document.getElementById('w-feels').textContent = `Føles ${feels}°`;
+
+  // Forecast
+  const days = {};
+  const todayStr = new Date().toISOString().slice(0,10);
+  for (const t of ts) {
+    const d2 = t.time.slice(0,10);
+    if (d2 === todayStr) continue;
+    if (!days[d2]) days[d2] = { temps:[], syms:[], rain:0 };
+    days[d2].temps.push(t.data.instant.details.air_temperature);
+    const s = t.data.next_6_hours?.summary?.symbol_code || t.data.next_1_hours?.summary?.symbol_code;
+    if (s) days[d2].syms.push(s);
+    days[d2].rain += t.data.next_1_hours?.details?.precipitation_amount || 0;
+  }
+
+  const keys = Object.keys(days).slice(0,5);
+  document.getElementById('forecast-body').innerHTML = keys.map(k => {
+    const dd = days[k];
+    const dt = new Date(k);
+    const dayN = DAY_NO[dt.getDay()].slice(0,3);
+    const max = Math.round(Math.max(...dd.temps));
+    const min = Math.round(Math.min(...dd.temps));
+    const s = dd.syms[Math.floor(dd.syms.length/2)] || 'cloudy';
+    const sb = s.replace(/_day|_night|_polartwilight/,'');
+    const icon = YR_ICONS[s] || YR_ICONS[sb] || '☁️';
+    const rain = dd.rain > 0.5 ? `${Math.round(dd.rain)}mm` : '';
+    return `<div class="fc-row">
+      <span class="fc-day">${dayN}</span>
+      <span class="fc-icon">${icon}</span>
+      <span class="fc-rain">${rain}</span>
+      <span class="fc-temps"><span class="fc-max">${max}°</span><span class="fc-min">${min}°</span></span>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// LOCATION DETECTION
+// ============================================================
+function detectLocation(events) {
+  const today = new Date().toISOString().slice(0,10);
+  const tomorrow = new Date(Date.now()+86400000).toISOString().slice(0,10);
+
+  for (const ev of events) {
+    const start = (ev.start?.dateTime || ev.start?.date || '').slice(0,10);
+    if (start !== today && start !== tomorrow) continue;
+    const hay = ((ev.summary||'')+' '+(ev.location||'')).toLowerCase();
+    for (const [key, kws] of Object.entries(LOCATION_KEYWORDS)) {
+      if (kws.some(k => hay.includes(k))) return LOCATIONS[key];
+    }
+  }
+  return LOCATIONS.default;
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+async function fetchCalendar() {
+  if (!GOOGLE_API_KEY || !CALENDAR_ID) {
+    document.getElementById('cal-body').innerHTML =
+      `<div class="setup-notice"><strong>Legg inn API-nøkkel og Kalender-ID</strong> øverst i scriptet for å vise kalender.</div>`;
+    document.getElementById('cal-dot').classList.add('err');
+    document.getElementById('cal-status-txt').textContent = 'Ikke konfigurert';
+    await fetchWeather(LOCATIONS.default);
+    renderDemoCalendar();
+    return;
+  }
+
+  const now = new Date();
+  const tMin = now.toISOString();
+  const tMax = new Date(now.getTime() + DAYS_AHEAD * 86400000).toISOString();
+  const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events` +
+    `?key=${GOOGLE_API_KEY}&timeMin=${tMin}&timeMax=${tMax}&singleEvents=true&orderBy=startTime&maxResults=100`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Cal ' + res.status);
+    const data = await res.json();
+    currentEvents = data.items || [];
+
+    document.getElementById('cal-dot').classList.remove('err');
+    document.getElementById('cal-status-txt').textContent =
+      `Oppdatert ${now.toLocaleTimeString('no-NO',{hour:'2-digit',minute:'2-digit'})}`;
+
+    const loc = detectLocation(currentEvents);
+    await fetchWeather(loc);
+    renderCalendar(currentEvents);
+    updateCountdown(currentEvents);
+    // Away game times fetched inside renderCalendar
+  } catch(e) {
+    document.getElementById('cal-dot').classList.add('err');
+    document.getElementById('cal-status-txt').textContent = 'Feil';
+    document.getElementById('cal-body').innerHTML =
+      `<div class="setup-notice" style="color:var(--red)">Feil: ${e.message}</div>`;
+    await fetchWeather(LOCATIONS.default);
+    console.error(e);
+  }
+}
+
+function renderCalendar(events) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().slice(0,10);
+
+  const groups = {};
+  for (let i = 0; i < DAYS_AHEAD; i++) {
+    const d = new Date(today.getTime() + i * 86400000);
+    groups[d.toISOString().slice(0,10)] = { date: d, events: [] };
+  }
+
+  for (const ev of events) {
+    const k = (ev.start?.dateTime || ev.start?.date || '').slice(0,10);
+    if (groups[k]) groups[k].events.push(ev);
+  }
+
+  let html = '';
+  for (const [k, g] of Object.entries(groups)) {
+    const isToday = k === todayStr;
+    const isTomorrow = k === new Date(today.getTime()+86400000).toISOString().slice(0,10);
+    const dayLabel = isToday ? 'I dag' : isTomorrow ? 'I morgen' : DAY_NO[g.date.getDay()];
+
+    html += `<div class="day-group">
+      <div class="day-header">
+        <span class="day-num${isToday?' today':''}">${g.date.getDate()}</span>
+        <span class="day-name">${dayLabel}</span>
+        ${isToday ? '<span class="today-chip">I DAG</span>' : ''}
+      </div>`;
+
+    if (!g.events.length) {
+      html += `<div class="no-events">Ingen hendelser</div>`;
+    } else {
+      g.events.forEach((ev, i) => {
+        const color = EVENT_COLORS[i % EVENT_COLORS.length];
+        const allDay = !!ev.start?.date && !ev.start?.dateTime;
+        const time = allDay ? 'Heldags' : new Date(ev.start.dateTime)
+          .toLocaleTimeString('no-NO',{hour:'2-digit',minute:'2-digit'});
+
+        // Detect project link
+        const hay = ((ev.summary||'')+' '+(ev.location||'')).toLowerCase();
+        let projectKey = null;
+        if (LOCATION_KEYWORDS.tjome.some(k => hay.includes(k))) projectKey = 'tjome';
+        else if (LOCATION_KEYWORDS.elgasen.some(k => hay.includes(k))) projectKey = 'elgasen';
+        else if (LOCATION_KEYWORDS.favang.some(k => hay.includes(k))) projectKey = 'favang';
+
+        // Away game detection
+        const isAway = hay.includes('borte') || hay.includes('bortekamp');
+        const loc = ev.location || '';
+
+        html += `<div class="event">
+          <div class="event-bar" style="background:${color}"></div>
+          <span class="event-time">${time}</span>
+          <div class="event-content">
+            <div class="event-name">${ev.summary || 'Ingen tittel'}</div>
+            ${loc ? `<div class="event-location">📍 ${loc}</div>` : ''}
+            ${isAway && loc ? `<div class="away-tip" id="away-${ev.id}">🚗 Henter kjøretid…</div>` : ''}
+          </div>
+          ${projectKey ? `<button class="event-project-btn" onclick="openProject('${projectKey}')">📋 Liste</button>` : ''}
+        </div>`;
+      });
+    }
+
+    html += '</div>';
+  }
+
+  document.getElementById('cal-body').innerHTML = html;
+
+  // Fetch away game travel times
+  currentEvents.forEach(ev => {
+    const hay = ((ev.summary||'')+' '+(ev.location||'')).toLowerCase();
+    if ((hay.includes('borte') || hay.includes('bortekamp')) && ev.location && GOOGLE_API_KEY) {
+      fetchAwayGameTime(ev);
+    }
+  });
+}
+
+// Demo calendar when not configured
+function renderDemoCalendar() {
+  const today = new Date();
+  document.getElementById('cal-body').innerHTML = `
+    <div class="day-group">
+      <div class="day-header">
+        <span class="day-num today">${today.getDate()}</span>
+        <span class="day-name">I dag</span>
+        <span class="today-chip">I DAG</span>
+      </div>
+      <div class="event">
+        <div class="event-bar" style="background:#4f7ef8"></div>
+        <span class="event-time">08:00</span>
+        <div class="event-content"><div class="event-name">Her vises dine kalenderoppføringer</div></div>
+      </div>
+      <div class="event">
+        <div class="event-bar" style="background:#3dd68c"></div>
+        <span class="event-time">18:15</span>
+        <div class="event-content"><div class="event-name">Eksempel: Fotballtrening Alvar ⚽</div></div>
+      </div>
+    </div>`;
+}
+
+// ============================================================
+// AWAY GAME
+// ============================================================
+async function fetchAwayGameTime(ev) {
+  if (!GOOGLE_API_KEY || !ev.location) return;
+
+  const start = ev.start?.dateTime;
+  if (!start) return;
+
+  const kickoff = new Date(start);
+  const arrivalBuffer = 20 * 60; // 20 min før kampstart
+  const departureTarget = new Date(kickoff.getTime() - arrivalBuffer * 1000);
+
+  const origin = COMMUTE_ORIGIN;
+  const dest = encodeURIComponent(ev.location);
+  const depTime = Math.floor(departureTarget.getTime() / 1000);
+
+  const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${dest}&departure_time=${depTime}&traffic_model=best_guess&key=${GOOGLE_API_KEY}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const leg = data.routes?.[0]?.legs?.[0];
+    if (!leg) return;
+
+    const durationInTraffic = leg.duration_in_traffic?.value || leg.duration.value;
+    const durationMin = Math.ceil(durationInTraffic / 60);
+    const recommendedDeparture = new Date(kickoff.getTime() - (durationMin + 20) * 60000);
+    const depStr = recommendedDeparture.toLocaleTimeString('no-NO',{hour:'2-digit',minute:'2-digit'});
+
+    const tipEl = document.getElementById(`away-${ev.id}`);
+    if (tipEl) {
+      tipEl.textContent = `🚗 Anbefaler avreise kl ${depStr} (${durationMin} min kjøring + 20 min buffer)`;
+    }
+  } catch(e) {
+    console.error('Away game fetch error', e);
+  }
+}
+
+// ============================================================
+// COMMUTE
+// ============================================================
+async function fetchCommute() {
+  const now = new Date();
+  const isWeekday = now.getDay() >= 1 && now.getDay() <= 5;
+  if (!isWeekday || !GOOGLE_API_KEY) return;
+
+  const url = `https://maps.googleapis.com/maps/api/directions/json` +
+    `?origin=${COMMUTE_ORIGIN}` +
+    `&destination=${encodeURIComponent('Innspurten 15, 0663 Oslo')}` +
+    `&waypoints=${encodeURIComponent('Haslum skole, Bærum')}` +
+    `&departure_time=now&traffic_model=best_guess&key=${GOOGLE_API_KEY}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const legs = data.routes?.[0]?.legs;
+    if (!legs) return;
+
+    const totalSec = legs.reduce((s, l) => s + (l.duration_in_traffic?.value || l.duration.value), 0);
+    const totalMin = Math.ceil(totalSec / 60);
+
+    const el = document.getElementById('commute-time');
+    const meta = document.getElementById('commute-meta');
+    const tip = document.getElementById('commute-tip');
+
+    el.textContent = `${totalMin} min`;
+    el.className = 'commute-time ' +
+      (totalMin <= COMMUTE_NORMAL_MIN ? 'fast' :
+       totalMin <= COMMUTE_NORMAL_MIN * 1.5 ? 'medium' : 'slow');
+
+    const diff = totalMin - COMMUTE_NORMAL_MIN;
+    meta.textContent = diff <= 2 ? `Normal kjøretid` : `+${diff} min over normalt`;
+
+    if (diff > 10) {
+      tip.textContent = `⚠️ Anbefaler å dra litt tidligere – trafikken er tett akkurat nå`;
+      tip.classList.remove('hidden');
+    } else {
+      tip.classList.add('hidden');
+    }
+  } catch(e) {
+    console.error('Commute fetch error', e);
+  }
+}
+
+// ============================================================
+// COUNTDOWN
+// ============================================================
+function updateCountdown(events) {
+  const now = new Date();
+  let soonest = null;
+  let soonestKey = null;
+  let soonestDays = Infinity;
+
+  for (const ev of events) {
+    const hay = ((ev.summary||'')+' '+(ev.location||'')).toLowerCase();
+    for (const [key, kws] of Object.entries(LOCATION_KEYWORDS)) {
+      if (kws.some(k => hay.includes(k))) {
+        const start = new Date(ev.start?.dateTime || ev.start?.date);
+        const diff = Math.ceil((start - now) / 86400000);
+        if (diff > 0 && diff < soonestDays) {
+          soonestDays = diff;
+          soonest = ev;
+          soonestKey = key;
+        }
+      }
+    }
+  }
+
+  if (!soonest) {
+    document.getElementById('countdown-card').classList.add('hidden');
+    return;
+  }
+
+  const loc = LOCATIONS[soonestKey];
+  document.getElementById('countdown-card').classList.remove('hidden');
+  document.getElementById('cd-icon').textContent = loc.icon;
+  document.getElementById('cd-dest').textContent = loc.name;
+  document.getElementById('cd-sub').textContent = soonest.summary || '';
+  document.getElementById('cd-days').textContent = soonestDays;
+}
+
+// ============================================================
+// DINNER
+// ============================================================
+const DINNER_EMOJIS = {
+  'taco':'🌮','pizza':'🍕','pasta':'🍝','laks':'🐟','torsk':'🐟','fisk':'🐟',
+  'kylling':'🍗','spaghetti':'🍝','burger':'🍔','suppe':'🍲','grøt':'🥣',
+  'biff':'🥩','svin':'🥩','kjøtt':'🥩','risotto':'🍚','ris':'🍚',
+  'wraps':'🌯','salat':'🥗','pølse':'🌭','lasagne':'🫕','chili':'🫕',
+};
+
+function getMealEmoji(meal) {
+  const m = (meal||'').toLowerCase();
+  for (const [k,v] of Object.entries(DINNER_EMOJIS)) {
+    if (m.includes(k)) return v;
+  }
+  return '🍽️';
+}
+
+function renderDinner() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const week = [];
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today.getTime() + i * 86400000);
+    week.push(d);
+  }
+
+  const todayStr = today.toISOString().slice(0,10);
+
+  document.getElementById('dinner-week').innerHTML = week.map(d => {
+    const k = d.toISOString().slice(0,10);
+    const meal = dinnerData[k] || '';
+    const emoji = getMealEmoji(meal);
+    const dayName = DAY_SH[d.getDay()];
+    const isToday = k === todayStr;
+    const votes = dinnerVotes[k] || { up: 0, down: 0 };
+
+    return `<div class="dinner-day${isToday?' today':''}" onclick="selectDinnerDay('${k}')">
+      <div class="dd-name">${dayName}</div>
+      ${meal
+        ? `<span class="dd-emoji">${emoji}</span><div class="dd-meal">${meal}</div>`
+        : `<span class="dd-emoji dd-empty">+</span><div class="dd-meal" style="color:var(--muted)">–</div>`}
+      ${meal ? `<div class="dinner-votes">
+        <button class="vote-btn${votes.myUp?' active':''}" onclick="vote(event,'${k}','up')">👍 ${votes.up||''}</button>
+        <button class="vote-btn${votes.myDown?' active':''}" onclick="vote(event,'${k}','down')">👎 ${votes.down||''}</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function selectDinnerDay(k) {
+  selectedDinnerDay = k;
+  const editEl = document.getElementById('dinner-edit');
+  editEl.style.display = 'flex';
+  const inp = document.getElementById('dinner-input');
+  inp.value = dinnerData[k] || '';
+  inp.focus();
+  inp.placeholder = `Middag ${k}…`;
+}
+
+function saveDinner() {
+  if (!selectedDinnerDay) return;
+  const val = document.getElementById('dinner-input').value.trim();
+  if (val) dinnerData[selectedDinnerDay] = val;
+  else delete dinnerData[selectedDinnerDay];
+  localStorage.setItem('dinnerData', JSON.stringify(dinnerData));
+  document.getElementById('dinner-edit').style.display = 'none';
+  selectedDinnerDay = null;
+  renderDinner();
+}
+
+function vote(e, k, type) {
+  e.stopPropagation();
+  if (!dinnerVotes[k]) dinnerVotes[k] = { up:0, down:0 };
+  const v = dinnerVotes[k];
+  if (type === 'up') { v.up = (v.up||0) + (v.myUp ? -1 : 1); v.myUp = !v.myUp; if (v.myUp) { v.myDown = false; v.down = Math.max(0,(v.down||0)-(v.myDown?1:0)); } }
+  else { v.down = (v.down||0) + (v.myDown ? -1 : 1); v.myDown = !v.myDown; if (v.myDown) { v.myUp = false; v.up = Math.max(0,(v.up||0)-(v.myUp?1:0)); } }
+  localStorage.setItem('dinnerVotes', JSON.stringify(dinnerVotes));
+  renderDinner();
+}
+
+// ============================================================
+// SHOPPING LIST
+// ============================================================
+function renderShopList() {
+  const el = document.getElementById('shop-list');
+  if (!shopItems.length) {
+    el.innerHTML = '<div class="no-events" style="padding:8px 0">Ingen varer på listen</div>';
+    return;
+  }
+  el.innerHTML = shopItems.map((item, i) =>
+    `<div class="shop-item${item.done?' done':''}" onclick="toggleShop(${i})">
+      <div class="check-box" style="border-color:var(--border2)">${item.done?'✓':''}</div>
+      <span class="shop-label">${item.text}</span>
+    </div>`
+  ).join('');
+}
+
+function addShopItem() {
+  const inp = document.getElementById('shop-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  shopItems.push({ text: val, done: false });
+  localStorage.setItem('shopItems', JSON.stringify(shopItems));
+  inp.value = '';
+  renderShopList();
+}
+
+function toggleShop(i) {
+  shopItems[i].done = !shopItems[i].done;
+  localStorage.setItem('shopItems', JSON.stringify(shopItems));
+  renderShopList();
+}
+
+// ============================================================
+// PROJECT MODAL
+// ============================================================
+function openProject(key) {
+  const proj = PROJECTS[key];
+  if (!proj) return;
+  if (!projectStates[key]) projectStates[key] = {};
+
+  const checks = proj.checklist.map((item, i) => {
+    const done = projectStates[key]['c'+i] || false;
+    return `<div class="project-check${done?' done':''}" onclick="toggleProject('${key}','c${i}',this)">
+      <div class="check-box">${done?'✓':''}</div>
+      <span class="check-label">${item}</span>
+    </div>`;
+  }).join('');
+
+  const shopping = proj.shopping.map((item, i) => {
+    const done = projectStates[key]['s'+i] || false;
+    return `<div class="project-check${done?' done':''}" onclick="toggleProject('${key}','s${i}',this)">
+      <div class="check-box">${done?'✓':''}</div>
+      <span class="check-label">${item}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-title">${proj.title}</div>
+    <div class="modal-sub">${proj.sub}</div>
+    <div class="modal-section">
+      <div class="modal-section-title">Gjøremål</div>
+      ${checks}
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Innkjøp</div>
+      ${shopping}
+    </div>
+    <button class="btn-small" style="width:100%;margin-top:8px;background:var(--s3);color:var(--muted2)" 
+      onclick="resetProject('${key}')">Nullstill for neste gang</button>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function toggleProject(key, id, el) {
+  if (!projectStates[key]) projectStates[key] = {};
+  projectStates[key][id] = !projectStates[key][id];
+  localStorage.setItem('projectStates', JSON.stringify(projectStates));
+  const done = projectStates[key][id];
+  el.classList.toggle('done', done);
+  el.querySelector('.check-box').textContent = done ? '✓' : '';
+}
+
+function resetProject(key) {
+  projectStates[key] = {};
+  localStorage.setItem('projectStates', JSON.stringify(projectStates));
+  openProject(key);
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModalBtn();
+}
+
+function closeModalBtn() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// ============================================================
+// WAKE ON TOUCH
+// ============================================================
+let wakeTimer = null;
+
+function wakeScreen() {
+  document.body.classList.add('night-awake');
+  document.getElementById('wake-btn').textContent = '💤 Sovner om 2 min';
+  clearTimeout(wakeTimer);
+  wakeTimer = setTimeout(() => {
+    document.body.classList.remove('night-awake');
+    document.getElementById('wake-btn').textContent = '👆 Trykk for å vekke skjermen';
+  }, 120000); // 2 minutter
+}
+
+// Trykk hvor som helst på skjermen vekker også
+document.addEventListener('click', (e) => {
+  if (document.body.classList.contains('night-mode') &&
+      !document.body.classList.contains('night-awake') &&
+      e.target.id !== 'wake-btn') {
+    wakeScreen();
+  }
+});
+updateClock();
+setInterval(updateClock, 30000);
+
+renderWhoWhere();
+checkBirthdays();
+renderDinner();
+renderShopList();
+fetchCalendar();
+fetchCommute();
+
+// Refresh intervals
+setInterval(fetchCalendar, 600000);   // 10 min
+setInterval(fetchCommute, 300000);    // 5 min
+setInterval(fetchWeather.bind(null, currentLoc), 1800000); // 30 min
+setInterval(renderWhoWhere, 60000);   // 1 min
+
+// Enter key for dinner
+document.getElementById('dinner-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveDinner();
+});
+</script>
+</body>
+</html>
