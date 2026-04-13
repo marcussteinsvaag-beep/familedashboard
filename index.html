@@ -1228,7 +1228,7 @@ function checkBirthdays() {
     if (diff <= 3 && diff >= 0) {
       const banner = document.getElementById('birthday-banner');
       banner.classList.remove('hidden');
-      const age = b.year ? (now.getFullYear() - b.year + (diff === 0 ? 0 : 1)) : null;
+      const age = b.year ? (now.getFullYear() - b.year) : null;
       const ageStr = age ? ` fyller ${age} år` : '';
       document.getElementById('birthday-name').textContent =
         `${b.emoji} ${b.name}${ageStr}${diff === 0 ? ' I DAG! 🎉' : ''}`;
