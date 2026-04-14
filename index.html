@@ -1536,7 +1536,8 @@ function renderChecklist(now) {
   const saved = checklistData[dateKey] || {};
 
   // Dynamic: check if Alvar has activity tomorrow
-  const tomorrow = new Date(now.getTime() + 86400000).toISOString().slice(0,10);
+const tom = new Date(now.getTime() + 86400000);
+const tomorrow = `${tom.getFullYear()}-${String(tom.getMonth()+1).padStart(2,'0')}-${String(tom.getDate()).padStart(2,'0')}`;
   const tomorrowEvents = currentEvents.filter(e => {
     const start = e.start?.dateTime || e.start?.date || '';
     return start.startsWith(tomorrow);
