@@ -1244,15 +1244,6 @@ const BIRTHDAYS = [
   // { name: 'Erik og Annes Sofie', date: '04-20', year: 2018, relation: 'venn', emoji: '🎈' },
 ];
 
-// Hvem er hvor – statuser (oppdater manuelt eller koble til kalender)
-const FAMILY = [
-  { name: 'Marcus',  initials: 'M', color: '#4f7ef8', defaultStatus: '🏢', defaultPlace: 'Jobb' },
-  { name: 'Ragnhild',initials: 'R', color: '#8b6ff7', defaultStatus: '🏠', defaultPlace: 'Hjemme' },
-  { name: 'Alvar',   initials: 'A', color: '#3dd68c', defaultStatus: '🏫', defaultPlace: 'Skole' },
-  { name: 'Ovidia',  initials: 'O', color: '#f568a8', defaultStatus: '🏫', defaultPlace: 'Skole' },
-  { name: 'Edvald',  initials: 'E', color: '#f5a054', defaultStatus: '🏫', defaultPlace: 'Barnehage' },
-];
-
 // Kveldsrutiner – hverdag (kan lage helg-variant)
 const ROUTINES_WEEKDAY = [
   { time: '19:30', who: 'Alle',    icon: '🍽️', what: 'Tid for kveldsmat' },
@@ -1371,7 +1362,6 @@ let shopItems = JSON.parse(localStorage.getItem('shopItems')||'[]');
 let dinnerData = JSON.parse(localStorage.getItem('dinnerData')||'{}');
 let dinnerVotes = JSON.parse(localStorage.getItem('dinnerVotes')||'{}');
 let checklistData = JSON.parse(localStorage.getItem('checklistData')||'{}');
-let whoStatus = JSON.parse(localStorage.getItem('whoStatus')||'{}');
 
 // ============================================================
 // CLOCK
@@ -1422,15 +1412,6 @@ function handleTimeBasedVisibility(now) {
   const showChecklist = tomorrowIsSchool && totalMin >= 1200 && totalMin <= 1380;
   document.getElementById('checklist-card').classList.toggle('hidden', !showChecklist);
   if (showChecklist) renderChecklist(now);
-}
-
-function cycleStatus(name) {
-  const current = whoStatus[name];
-  const idx = current ? STATUS_CYCLE.findIndex(s => s.icon === current.icon) : -1;
-  const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
-  whoStatus[name] = next;
-  localStorage.setItem('whoStatus', JSON.stringify(whoStatus));
-  renderWhoWhere();
 }
 
 // ============================================================
