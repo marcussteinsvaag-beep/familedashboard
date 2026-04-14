@@ -1671,7 +1671,6 @@ function renderWeather(data) {
 
   // Forecast
   const days = {};
-  const todayStr = new Date().toISOString().slice(0,10);
   for (const t of ts) {
     const d2 = t.time.slice(0,10);
     if (d2 === todayStr) continue;
