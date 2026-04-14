@@ -1641,9 +1641,7 @@ async function fetchWeather(loc) {
   document.getElementById('loc-name').textContent = `${loc.icon || ''} ${loc.name}`;
 
   try {
-    const res = await fetch(
-      { headers: { 'User-Agent': 'FamiliedashboardHaslum/1.0 privat' } }
-    );
+    const res = await fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${loc.lat}&lon=${loc.lon}`);
     if (!res.ok) throw new Error('Yr ' + res.status);
     const data = await res.json();
     renderWeather(data);
