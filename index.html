@@ -1424,38 +1424,6 @@ function handleTimeBasedVisibility(now) {
   if (showChecklist) renderChecklist(now);
 }
 
-// ============================================================
-// WHO IS WHERE
-// ============================================================
-function renderWhoWhere() {
-  const isWeekday = new Date().getDay() >= 1 && new Date().getDay() <= 5;
-  const hour = new Date().getHours();
-
-  const list = document.getElementById('who-list');
-  list.innerHTML = FAMILY.map(p => {
-    const saved = whoStatus[p.name];
-    let status = saved ? saved.icon : p.defaultStatus;
-    let place  = saved ? saved.place : (isWeekday && hour >= 8 && hour < 16 ? p.defaultPlace : 'Hjemme');
-
-    return `<div class="person-row" onclick="cycleStatus('${p.name}')">
-      <div class="person-avatar" style="background:${p.color}22;color:${p.color}">${p.initials}</div>
-      <span class="person-name">${p.name}</span>
-      <span class="person-status">${status}</span>
-    </div>`;
-  }).join('');
-}
-
-const STATUS_CYCLE = [
-  { icon: '🏠', place: 'Hjemme' },
-  { icon: '🏢', place: 'Jobb/Skole' },
-  { icon: '⚽', place: 'Trening' },
-  { icon: '🏥', place: 'Lege' },
-  { icon: '🛒', place: 'Butikk' },
-  { icon: '✈️', place: 'Reise' },
-  { icon: '🌊', place: 'Tjøme' },
-  { icon: '⛷️', place: 'Fjellet' },
-];
-
 function cycleStatus(name) {
   const current = whoStatus[name];
   const idx = current ? STATUS_CYCLE.findIndex(s => s.icon === current.icon) : -1;
