@@ -687,6 +687,234 @@ body.night-mode.night-awake .wake-btn { background: rgba(255,255,255,0.06); colo
 
 .project-check:last-child { border-bottom: none; }
 
+/* FAMILIEBANKEN */
+.bank-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px 0;
+}
+
+.bank-tab {
+  flex: 1;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 7px 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.bank-tab.active {
+  background: var(--s2);
+  border-color: var(--border2);
+  color: var(--text);
+}
+
+.bank-tab-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bank-tab-points {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--yellow);
+}
+
+.bank-content { padding: 12px 16px; }
+
+.bank-progress {
+  margin-bottom: 14px;
+}
+
+.bank-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.bank-progress-label span:last-child { color: var(--yellow); font-weight: 500; }
+
+.bank-bar-outer {
+  height: 8px;
+  background: var(--s3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.bank-bar-inner {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.bank-next-reward {
+  font-size: 11px;
+  color: var(--muted2);
+  text-align: right;
+}
+
+.bank-tasks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.bank-task {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.bank-task:hover { border-color: var(--border2); background: var(--s3); }
+.bank-task:active { transform: scale(0.97); }
+
+.bank-task-left { display: flex; align-items: center; gap: 7px; }
+.bank-task-icon { font-size: 16px; flex-shrink: 0; }
+.bank-task-name { font-size: 12px; color: var(--text); line-height: 1.2; }
+.bank-task-pts {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--yellow);
+  background: rgba(245,200,66,0.1);
+  border-radius: 6px;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+
+.bank-section-title {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.bank-rewards { display: flex; flex-direction: column; gap: 6px; }
+
+.bank-reward {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.bank-reward:hover { border-color: var(--border2); }
+.bank-reward.affordable { border-color: rgba(61,214,140,0.3); background: rgba(61,214,140,0.05); }
+.bank-reward.affordable:hover { border-color: var(--green); }
+.bank-reward.locked { opacity: 0.5; cursor: not-allowed; }
+
+.bank-reward-icon { font-size: 20px; flex-shrink: 0; }
+.bank-reward-text { flex: 1; }
+.bank-reward-name { font-size: 13px; color: var(--text); }
+.bank-reward-cost {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--yellow);
+  flex-shrink: 0;
+}
+
+.bank-reward-cost.can-afford { color: var(--green); }
+
+.bank-history {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.bank-history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12px;
+  color: var(--muted2);
+  border-bottom: 1px solid var(--border);
+}
+
+.bank-history-item:last-child { border-bottom: none; }
+.bank-history-pts { margin-left: auto; font-weight: 500; }
+.bank-history-pts.positive { color: var(--green); }
+.bank-history-pts.negative { color: var(--red); }
+
+/* Confirm modal */
+.confirm-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.confirm-modal.open { opacity: 1; pointer-events: all; }
+
+.confirm-box {
+  background: var(--s1);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 24px;
+  width: min(360px, 90vw);
+  text-align: center;
+  transform: translateY(20px);
+  transition: transform 0.2s;
+}
+
+.confirm-modal.open .confirm-box { transform: translateY(0); }
+
+.confirm-icon { font-size: 40px; margin-bottom: 12px; }
+.confirm-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
+.confirm-sub { font-size: 13px; color: var(--muted2); margin-bottom: 20px; line-height: 1.5; }
+
+.confirm-btns { display: flex; gap: 8px; }
+.confirm-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.confirm-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.confirm-btn.primary:hover { opacity: 0.85; }
+.confirm-btn.secondary { background: var(--s2); color: var(--muted2); }
+.confirm-btn.secondary:hover { border-color: var(--border2); color: var(--text); }
+
 /* SHOPPING LIST */
 .shop-list { padding: 8px 16px; }
 
@@ -787,6 +1015,19 @@ body.night-mode.night-awake .wake-btn { background: rgba(255,255,255,0.06); colo
 <!-- WAKE BUTTON -->
 <button class="wake-btn" id="wake-btn" onclick="wakeScreen()">👆 Trykk for å vekke skjermen</button>
 
+<!-- CONFIRM MODAL -->
+<div class="confirm-modal" id="confirm-modal">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">🎯</div>
+    <div class="confirm-title" id="confirm-title">Er du sikker?</div>
+    <div class="confirm-sub" id="confirm-sub">–</div>
+    <div class="confirm-btns">
+      <button class="confirm-btn secondary" onclick="closeConfirm()">Avbryt</button>
+      <button class="confirm-btn primary" id="confirm-ok" onclick="confirmAction()">Ja!</button>
+    </div>
+  </div>
+</div>
+
 <!-- PROJECT MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
   <div class="modal" style="position:relative">
@@ -881,6 +1122,16 @@ body.night-mode.night-awake .wake-btn { background: rgba(255,255,255,0.06); colo
         <input class="dinner-input" id="dinner-input" placeholder="Hva er til middag? (f.eks. Taco 🌮)" />
         <button class="btn-small" onclick="saveDinner()">Lagre</button>
       </div>
+    </div>
+
+    <!-- FAMILIEBANKEN -->
+    <div class="card" id="bank-card">
+      <div class="card-header">
+        <div class="card-title">🏦 Familiebanken</div>
+        <div style="font-size:11px;color:var(--muted)" id="bank-admin-btn" onclick="toggleBankAdmin()" style="cursor:pointer">⚙️ Admin</div>
+      </div>
+      <div class="bank-tabs" id="bank-tabs"></div>
+      <div class="bank-content" id="bank-content"></div>
     </div>
 
     <!-- COUNTDOWN -->
@@ -1228,7 +1479,7 @@ function checkBirthdays() {
     if (diff <= 3 && diff >= 0) {
       const banner = document.getElementById('birthday-banner');
       banner.classList.remove('hidden');
-      const age = b.year ? (now.getFullYear() - b.year) : null;
+      const age = b.year ? (now.getFullYear() - b.year + (diff === 0 ? 0 : 1)) : null;
       const ageStr = age ? ` fyller ${age} år` : '';
       document.getElementById('birthday-name').textContent =
         `${b.emoji} ${b.name}${ageStr}${diff === 0 ? ' I DAG! 🎉' : ''}`;
@@ -1518,9 +1769,8 @@ async function fetchCalendar() {
 }
 
 function renderCalendar(events) {
-const now2 = new Date();
-const todayStr = `${now2.getFullYear()}-${String(now2.getMonth()+1).padStart(2,'0')}-${String(now2.getDate()).padStart(2,'0')}`;
-const today = new Date(todayStr);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().slice(0,10);
 
   const groups = {};
   for (let i = 0; i < DAYS_AHEAD; i++) {
@@ -1941,6 +2191,195 @@ document.addEventListener('click', (e) => {
     wakeScreen();
   }
 });
+// ============================================================
+// FAMILIEBANKEN
+// ============================================================
+const BANK_CHILDREN = [
+  { id: 'alvar',  name: 'Alvar',  color: '#3dd68c', emoji: '⚽' },
+  { id: 'ovidia', name: 'Ovidia', color: '#f568a8', emoji: '🎵' },
+  { id: 'edvald', name: 'Edvald', color: '#f5a054', emoji: '🚂' },
+];
+
+const BANK_TASKS = [
+  { id: 'søppel',      icon: '🗑️', name: 'Søppel ut',         pts: 5  },
+  { id: 'oppvask',     icon: '🍽️', name: 'Tøm oppvaskmaskin', pts: 5  },
+  { id: 'bord',        icon: '🍴', name: 'Dekke bordet',       pts: 3  },
+  { id: 'rom',         icon: '🛏️', name: 'Rydde rommet',       pts: 8  },
+  { id: 'støvsuge',    icon: '🧹', name: 'Støvsuge',           pts: 10 },
+  { id: 'mat',         icon: '👨‍🍳', name: 'Hjelpe med mat',    pts: 8  },
+  { id: 'bad',         icon: '🚿', name: 'Vaske bad',          pts: 12 },
+  { id: 'handle',      icon: '🛒', name: 'Handle',             pts: 10 },
+  { id: 'fisk',        icon: '🐟', name: 'Mate fiskene',       pts: 3  },
+  { id: 'hente',       icon: '🚶', name: 'Hente søsken',       pts: 15, onlyFor: ['alvar'] },
+  { id: 'lage-middag', icon: '🍳', name: 'Lage middag',        pts: 20, onlyFor: ['alvar'] },
+];
+
+const BANK_REWARDS = [
+  { id: 'film',        icon: '🎬', name: 'Velge kveldsfilm',      cost: 50  },
+  { id: 'is',          icon: '🍦', name: 'Is eller godteri-kveld', cost: 100 },
+  { id: 'middag',      icon: '🌮', name: 'Velge fredagsmiddag',    cost: 150 },
+  { id: 'overnatting', icon: '🏕️', name: 'Venn på overnatting',    cost: 200 },
+  { id: 'aktivitet',   icon: '🎳', name: 'Valgfri aktivitet',      cost: 300 },
+];
+
+let bankData = JSON.parse(localStorage.getItem('bankData') || '{}');
+let selectedChild = 'alvar';
+let pendingConfirm = null;
+
+function getBankPoints(childId) {
+  return bankData[childId]?.points || 0;
+}
+
+function getBankHistory(childId) {
+  return bankData[childId]?.history || [];
+}
+
+function addBankPoints(childId, pts, label) {
+  if (!bankData[childId]) bankData[childId] = { points: 0, history: [] };
+  bankData[childId].points = Math.max(0, bankData[childId].points + pts);
+  bankData[childId].history.unshift({
+    label, pts,
+    time: new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' }),
+    date: new Date().toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }),
+  });
+  bankData[childId].history = bankData[childId].history.slice(0, 10);
+  localStorage.setItem('bankData', JSON.stringify(bankData));
+}
+
+function getNextReward(points) {
+  return BANK_REWARDS.find(r => r.cost > points);
+}
+
+function renderBank() {
+  const tabsEl = document.getElementById('bank-tabs');
+  if (!tabsEl) return;
+
+  tabsEl.innerHTML = BANK_CHILDREN.map(c => {
+    const pts = getBankPoints(c.id);
+    const isActive = c.id === selectedChild;
+    return `<button class="bank-tab${isActive ? ' active' : ''}" onclick="selectBankChild('${c.id}')">
+      <div class="bank-tab-avatar" style="background:${c.color}22;color:${c.color}">${c.emoji}</div>
+      <span style="font-size:11px">${c.name}</span>
+      <span class="bank-tab-points">${pts}p</span>
+    </button>`;
+  }).join('');
+
+  const child = BANK_CHILDREN.find(c => c.id === selectedChild);
+  const points = getBankPoints(selectedChild);
+  const history = getBankHistory(selectedChild);
+  const nextReward = getNextReward(points);
+  const prevReward = [...BANK_REWARDS].reverse().find(r => r.cost <= points);
+  const progressBase = prevReward ? prevReward.cost : 0;
+  const progressTarget = nextReward ? nextReward.cost : BANK_REWARDS[BANK_REWARDS.length-1].cost;
+  const progressPct = nextReward
+    ? Math.min(100, ((points - progressBase) / (progressTarget - progressBase)) * 100)
+    : 100;
+
+  const tasks = BANK_TASKS.filter(t => !t.onlyFor || t.onlyFor.includes(selectedChild));
+
+  document.getElementById('bank-content').innerHTML = `
+    <div class="bank-progress">
+      <div class="bank-progress-label">
+        <span>${points} poeng</span>
+        <span>${nextReward ? `${progressTarget - points}p til "${nextReward.name}"` : '🏆 Alt tilgjengelig!'}</span>
+      </div>
+      <div class="bank-bar-outer">
+        <div class="bank-bar-inner" style="width:${progressPct}%;background:${child.color}"></div>
+      </div>
+    </div>
+    <div class="bank-section-title">Oppgaver – trykk når du er ferdig</div>
+    <div class="bank-tasks">
+      ${tasks.map(t => `
+        <div class="bank-task" onclick="startTask('${t.id}','${t.icon}','${t.name}',${t.pts})">
+          <div class="bank-task-left">
+            <span class="bank-task-icon">${t.icon}</span>
+            <span class="bank-task-name">${t.name}</span>
+          </div>
+          <span class="bank-task-pts">+${t.pts}p</span>
+        </div>`).join('')}
+    </div>
+    <div class="bank-section-title">Belønninger</div>
+    <div class="bank-rewards">
+      ${BANK_REWARDS.map(r => {
+        const canAfford = points >= r.cost;
+        return `<div class="bank-reward${canAfford ? ' affordable' : ' locked'}"
+          onclick="${canAfford ? `startRedeem('${r.id}','${r.icon}','${r.name}',${r.cost})` : ''}">
+          <span class="bank-reward-icon">${r.icon}</span>
+          <div class="bank-reward-text"><div class="bank-reward-name">${r.name}</div></div>
+          <span class="bank-reward-cost${canAfford ? ' can-afford' : ''}">${r.cost}p</span>
+        </div>`;
+      }).join('')}
+    </div>
+    ${history.length ? `
+    <div class="bank-history">
+      <div class="bank-section-title" style="margin-bottom:6px">Siste aktivitet</div>
+      ${history.slice(0,5).map(h => `
+        <div class="bank-history-item">
+          <span style="flex-shrink:0">${h.date}</span>
+          <span style="flex:1;margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.label}</span>
+          <span class="bank-history-pts ${h.pts > 0 ? 'positive' : 'negative'}">${h.pts > 0 ? '+' : ''}${h.pts}p</span>
+        </div>`).join('')}
+    </div>` : ''}
+  `;
+}
+
+function selectBankChild(id) {
+  selectedChild = id;
+  renderBank();
+}
+
+function startTask(id, icon, name, pts) {
+  const child = BANK_CHILDREN.find(c => c.id === selectedChild);
+  pendingConfirm = { type: 'task', pts, label: name };
+  document.getElementById('confirm-icon').textContent = icon;
+  document.getElementById('confirm-title').textContent = `${child.name} gjorde: ${name}`;
+  document.getElementById('confirm-sub').textContent = `Dette gir +${pts} poeng. Saldo nå: ${getBankPoints(selectedChild)} poeng.`;
+  document.getElementById('confirm-ok').textContent = `Ja, +${pts}p! 🎉`;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+function startRedeem(id, icon, name, cost) {
+  const child = BANK_CHILDREN.find(c => c.id === selectedChild);
+  const points = getBankPoints(selectedChild);
+  pendingConfirm = { type: 'redeem', cost, label: name };
+  document.getElementById('confirm-icon').textContent = icon;
+  document.getElementById('confirm-title').textContent = `Løs inn: ${name}`;
+  document.getElementById('confirm-sub').textContent = `Dette koster ${cost} poeng. ${child.name} har ${points}p og vil ha ${points - cost}p igjen.`;
+  document.getElementById('confirm-ok').textContent = `Ja, løs inn! 🎉`;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+function confirmAction() {
+  if (!pendingConfirm) return;
+  if (pendingConfirm.type === 'task') {
+    addBankPoints(selectedChild, pendingConfirm.pts, pendingConfirm.label);
+  } else if (pendingConfirm.type === 'redeem') {
+    addBankPoints(selectedChild, -pendingConfirm.cost, `Løst inn: ${pendingConfirm.label}`);
+  }
+  pendingConfirm = null;
+  closeConfirm();
+  renderBank();
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  pendingConfirm = null;
+}
+
+function toggleBankAdmin() {
+  const input = prompt('Admin: Juster poeng\nFormat: "alvar +20" eller "ovidia -10"');
+  if (!input) return;
+  const parts = input.toLowerCase().trim().split(' ');
+  const childId = parts[0];
+  const pts = parseInt(parts[1]);
+  if (!BANK_CHILDREN.find(c => c.id === childId) || isNaN(pts)) {
+    alert('Ugyldig. Bruk f.eks: "alvar +20"');
+    return;
+  }
+  addBankPoints(childId, pts, 'Admin-justering');
+  renderBank();
+}
+
 updateClock();
 setInterval(updateClock, 30000);
 
@@ -1948,6 +2387,7 @@ renderWhoWhere();
 checkBirthdays();
 renderDinner();
 renderShopList();
+renderBank();
 fetchCalendar();
 fetchCommute();
 
