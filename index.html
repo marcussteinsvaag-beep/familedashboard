@@ -1459,7 +1459,7 @@ function updateMorningReminder(show, now) {
       items.push(`⚽ Husk fotballutstyr${name ? ' til ' + name : ''}`);
     }
     if (title.includes('korps') || title.includes('musikk')) {
-      items.push('🎺 Husk instrument og noter til Alvar');
+      items.push('🎺 Husk Trommer og noter til Ovidia');
     }
     if (title.includes('klassetur') || title.includes('tur')) {
       items.push('🎒 Sjekk pakkeliste for turen');
@@ -1550,21 +1550,18 @@ const tomorrow = `${tom.getFullYear()}-${String(tom.getMonth()+1).padStart(2,'0'
     { id: 'vannflasker', label: '💧 Vannflasker x3' },
   ];
 
-for (const ev of tomorrowEvents) {
-    const t = (ev.summary || '').toLowerCase();
-    if ((t.includes('g2013') || t.includes('fotballakademi alvar')) && !items.find(i => i.id === 'treningsbag-alvar')) {
-      items.push({ id: 'treningsbag-alvar', label: '⚽ Treningsbag og drakt til Alvar' });
-    }
-    if ((t.includes('mygg') || t.includes('edvald')) && !items.find(i => i.id === 'treningsbag-edvald')) {
-      items.push({ id: 'treningsbag-edvald', label: '⚽ Fotballutstyr til Edvald' });
-    }
-    if ((t.includes('j2017') || t.includes('fotballakademi ovidia')) && !items.find(i => i.id === 'treningsbag-ovidia')) {
-      items.push({ id: 'treningsbag-ovidia', label: '⚽ Fotballutstyr til Ovidia' });
-    }
-   if (t.includes('korps') && !items.find(i => i.id === 'korps')) {
+   if (tomorrowEvents.some(e => (e.summary||'').toLowerCase().includes('g2013') || (e.summary||'').toLowerCase().includes('fotballakademi alvar'))) {
+  items.push({ id: 'treningsbag-alvar', label: '⚽ Treningsbag og drakt til Alvar' });
+}
+if (tomorrowEvents.some(e => (e.summary||'').toLowerCase().includes('mygg') || (e.summary||'').toLowerCase().includes('edvald'))) {
+  items.push({ id: 'treningsbag-edvald', label: '⚽ Fotballutstyr til Edvald' });
+}
+if (tomorrowEvents.some(e => (e.summary||'').toLowerCase().includes('j2017') || (e.summary||'').toLowerCase().includes('fotballakademi ovidia'))) {
+  items.push({ id: 'treningsbag-ovidia', label: '⚽ Fotballutstyr til Ovidia' });
+}
+if (tomorrowEvents.some(e => (e.summary||'').toLowerCase().includes('korps'))) {
   items.push({ id: 'korps', label: '🥁 Tromme og noter til Ovidia' });
-  }
-  }
+}
 
   document.getElementById('checklist-body').innerHTML = items.map(item => {
     const done = saved[item.id] || false;
