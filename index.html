@@ -1642,7 +1642,6 @@ async function fetchWeather(loc) {
 
   try {
     const res = await fetch(
-      `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${loc.lat}&lon=${loc.lon}`,
       { headers: { 'User-Agent': 'FamiliedashboardHaslum/1.0 privat' } }
     );
     if (!res.ok) throw new Error('Yr ' + res.status);
