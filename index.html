@@ -996,7 +996,7 @@ async function fetchAwayGameTime(ev) {
   const dest=encodeURIComponent(ev.location);
   const depTime=Math.floor((kickoff.getTime()-20*60000)/1000);
   try {
-    const res=await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=Vestliveien+20B,Bærum,Norway&destination=${dest}&departure_time=${depTime}&traffic_model=best_guess&key=${GOOGLE_API_KEY}`);
+ const res=await fetch(`https://directions-proxy.marcus-steinsvaag.workers.dev?origin=Vestliveien+20B,Bærum,Norway&destination=${dest}&departure_time=${depTime}`);
     const data=await res.json();
     const leg=data.routes?.[0]?.legs?.[0];
     if(!leg) return;
@@ -1013,9 +1013,9 @@ async function fetchAwayGameTime(ev) {
 // ============================================================
 async function fetchCommute() {
   const now=new Date();
-  if(now.getDay()<1||now.getDay()>5||!GOOGLE_API_KEY) return;
+ if(now.getDay()<1||now.getDay()>5) return;
   try {
-    const res=await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=Vestliveien+20B,Bærum,Norway&destination=Innspurten+15,0663+Oslo&waypoints=Haslum+skole,Bærum&departure_time=now&traffic_model=best_guess&key=${GOOGLE_API_KEY}`);
+   const res = await fetch(`https://directions-proxy.marcus-steinsvaag.workers.dev?origin=Vestliveien+20B,Bærum,Norway&destination=Innspurten+15,0663+Oslo&waypoints=Haslum+skole,Bærum`);
     const data=await res.json();
     const legs=data.routes?.[0]?.legs;
     if(!legs) return;
