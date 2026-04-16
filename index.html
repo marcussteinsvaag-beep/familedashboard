@@ -201,23 +201,25 @@ body.night-mode .wake-btn { display: block; }
   overflow: hidden;
   box-shadow: var(--shadow-lg);
 }
-.weather-top { padding: 20px 20px 14px; }
-.weather-loc { font-size: 12px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; }
-.weather-temp { font-family: 'Playfair Display', serif; font-size: 80px; letter-spacing: -3px; line-height: 1; color: #fff; }
-.weather-desc { font-size: 18px; color: rgba(255,255,255,0.85); margin: 6px 0 4px; }
-.weather-meta { font-size: 13px; color: rgba(255,255,255,0.65); display: flex; flex-direction: column; gap: 3px; }
+.weather-inner { display: grid; grid-template-columns: 1fr 1fr; }
+.weather-left { padding: 18px 16px 16px; border-right: 1px solid rgba(255,255,255,0.1); }
+.weather-right { padding: 18px 16px 16px; }
+.weather-loc { font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
+.weather-temp { font-family: 'Playfair Display', serif; font-size: 72px; letter-spacing: -3px; line-height: 1; color: #fff; }
+.weather-desc { font-size: 16px; color: rgba(255,255,255,0.85); margin: 6px 0 4px; }
+.weather-meta { font-size: 12px; color: rgba(255,255,255,0.65); display: flex; flex-direction: column; gap: 3px; }
 
-.hourly { padding: 12px 20px 14px; border-top: 1px solid rgba(255,255,255,0.1); }
-.hourly-title { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
-.hourly-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 14px; }
+.hourly { margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+.hourly-title { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.hourly-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
 .hourly-row:last-child { border-bottom: none; }
-.hourly-time { color: rgba(255,255,255,0.6); min-width: 48px; font-feature-settings: "tnum"; }
-.hourly-icon { font-size: 20px; }
-.hourly-rain { color: #80d0ff; font-size: 13px; min-width: 50px; text-align: center; }
-.hourly-temp { font-weight: 600; color: #fff; min-width: 36px; text-align: right; font-size: 15px; }
+.hourly-time { color: rgba(255,255,255,0.6); min-width: 40px; font-size: 12px; font-feature-settings: "tnum"; }
+.hourly-icon { font-size: 16px; }
+.hourly-rain { color: #80d0ff; font-size: 11px; min-width: 36px; text-align: center; }
+.hourly-temp { font-weight: 600; color: #fff; min-width: 28px; text-align: right; font-size: 13px; }
 
-.forecast { padding: 12px 20px 16px; border-top: 1px solid rgba(255,255,255,0.1); }
-.forecast-title { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.forecast { }
+.forecast-title { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
 .fc-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
 .fc-row:last-child { border-bottom: none; }
 .fc-day { color: rgba(255,255,255,0.65); min-width: 34px; text-transform: capitalize; font-size: 14px; }
@@ -486,7 +488,7 @@ body.night-mode .wake-btn { display: block; }
   </div>
 
   <div class="commute-card hidden" id="commute-card">
-    <div class="commute-icon">🚗</div>
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAB4AHgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDxv4l2Xh3xLqP9paHpcuiXT/69fMEkUh9doA2n6cVyEPhS8ikEkeporjv5Z/xrraK+ajnWMjtP8Efqj4Xyx70/xf8Amc/YaA8M7S3UkF2NpCKwZQrf3sA8/TpVybSUnuEuWZbWYD5pLMbC3uQeB+FalFariDHr7f4L/IzfCeVv/l3/AOTS/wAzHudBhmhEb3d5IVPy+ZJkD8KrR+HXgVjbXhjduMlcjH0roaKr/WLMP5/wX+QlwllS/wCXb/8AApf5nTfs/a/o/wAM9Wu9W1LR5tavZcCJopliWMfiDmvXbz9omwubl528J3gLf9PqcD/vmvnyiuP+08S587lqa/6sZba3s/xf+Z9G6N+0jpOmlmHg2+kkb+I3yf8AxNaE/wC03oN8nl3vg2/VfVbxGI/8dFfMVFN5rim7834IX+q+WWt7P8X/AJn0vF8cPA1wPKmtNXhifgq8KvgfUHn8q8q8a+G/BGpa83iDwZqUFyl03+k6UZjazI5P+si3DB/3TxnmvPaATXdhuI8VR3s0ediOCcBV1g5Rfrf+vvMr4hQa3oeuGx120v7SKcAxS36pNL5WcZDrkHHsfyq3qA8Ot4Ja2j8aX95BFe/6JYiAISm45kZSPkOCT948mrGpomqWQs9Q3zxJkx5Y5jJ7qe38q4zUdCv9OaOR2ka1MmIpx9xW7Bv7pr6zLM9pYx8r0l2/yPjs34axGWrnvzQ7r9UbEOjWllfQX9jqEFyUO4RXkQKtx0YZ96KsQ+J/Cp0lrPVvDd3d61vYyajb6gP3xz3DAgD6daK91Vo9D5twqGrRRRX4uf0MFFFFABRRRQAUUUUAFFFFABRRRQADrXpv7P1pb6tr+r6JqGlLqunXWlyfabU4yQHT5lz/ABDPHevMhXrv7JbuPiZeYICjTJQfXG+OuvA1HTxEJrozyc8ip5fVi+xzfxW/Z7NranU/AYa/slctPasC13APTH8QHp1+tFfXN/p0bz/2haLFHfoCFcrww9DRX39PMHy6o/G5QaZ8G0UUV+an70FFFFABRRTby8i05kj8kXOoSDMVufuoP78n/wAT+fpXRh8PPET5YHDmGY0MBS9pVfour9BLiWK28v7TKsAkXcjSAgMPUcc1A2qaQgO6/dv+udpI38wKo3Ykmme5vJ2ublvvyOeB7AdgKzp3xkg4Havfp5RQiveuz8/xHF2OqS/dJRXpd/j/AJG0+uaMo/1mpMf9mxx/NxUJ8R6OOsWrN9LaMfzkrA/fTg+UvA4yahltbgDqD+NbLLcMvs/izjfEmaP/AJefgv8AI6RvFGigf8eesn6rEP8A2aoz4q0ntY6t+cX+Ncs1vIxILbcdsUw2j/3v0pfVMItHFfiUs5zeauqj/A6z/hK9JHWx1X/vuKvZf2O9bsNQ+KV9BbW99G50mZ8ztGVwJIhgbea+bpLbK4Cvn1yK9T/Zg1+Pwj4+vdYvSBGmkzRrubG4l4zj6nFZ1qeGoU3UildErH5niZeyqTbT3PvJnwMkUV5F4T8Y+NfG0rtY6UNJtCfkuJN0h2+pJwAfYA0VlDGSmrxics8Lyu0nY+XayvEOp3elwpPBYpcxnIdmcgIe2cfjWrRXg0ZxhNSkrrsfreLo1K1GUKc+WT69jij421FDkWGlkehLN/7NWtoviibV7qKBtHitvlYyTQs5QjtwxOOeOveuistEF3fWsEGlxy3N04W3SO1DySsTgBQByc8V2Wl+BrLRtI/4SHVZrWHT4J3jiZJlcGRTh0QrkNggg7cgEHk4r3qcaWJg1Glbzsj84xOYYnLMTG2J9q09Ypt+qd9F6b+RxNxJc29gbu0sp7ycsUhSKFnAYdWbA6D07ms7SLW6jsp5rmx1A6hNITI0ls+SvbBxXc6n8QvD1rGxh0hJoDkGSZCyufpuGTTn8R6bqHh9dZPh2xn0nzhbyXFlNJG9vJ2WSJuVz2IJFduGofV4csUeLmeZ4rH1nVnH0V9l22OCmstQmziznRV7PGwLfpWc+k6rI5zbXCg9CYuK9h8Oa34Wtotr6E0q7yCXMbkNgHBZk3YwQRzVyS+8Db5JR4fUNIcsWnb9B0H0FW6zXQ8N49p2cbP1/wCAeL22m6lbRGI2LuAeCGX/ABpXstQPSwf/AL7T/GvX21bwVH00KH8ZnP8AWoz4j8IJ00O2H/bR/wD4ql7Yn+0H2X9fI8fk0XWZMFNPdMjOTJHz/wCPU5NC1U7Q2nsDj5iJo/8A4qvVbvxh4Vtwp/4RuOcE9E3v+Y3Uyf4o6GRtHhaVAOnl2IX+VTJqe6Omhm1an8FrHmi+HdSI/wCPRv8Av5H/APFV0vw90vWdN1ma7ghhiZICGMpSQYLqOgY49c1tP8SdEJ/5F7UB9IcV3vwJ1jQ/GvjC60caRe2mNPkmMjrtBw6DHv8Ae6Vy4mip0ZRitWj0MHneI+sQ57Wueh+HfCnj77HDe2XiPTBHKisqgSL+GVOKK7G10mbw/AF0/Vore2HSG4AEf4en4UVwUMA1Cziz1a+MU535kfFVMnfy49/uB+ZxT6r6kP8AQpD/AHcN+RFedh4qVWKe10fp+YTlTwtScN1FtfcWPhn4zTwr4rGp3du17CYJ7ZgJdkkayqyM8bYO1wGJBxjP1zViHxFKPCdl4YlF3NaaWZF068igSQGJ2LbJYi3ByeqtXDtqjaVdkiOOR1l2jzEVgee4IINaH/CVuwy2i6Ln1WxjU/oBX1UJOGltD8ApValG+l02a8YjulFvdWl9cx9VS2tGX/x1mIFeqeA7bRYPDT2l/wCG9Tkha4W4bT2hES3Tr9wzz5zsX+5GnP8Aerwu411pv+XaKH/rjlP5VRk1q/muktbWabGfm3zPg+3B6VaqSk7JG0cRWqvljGx6r4x1PTNMu7qW7ktbaaWUyPb2y5EZPAXA4UAAAAnNcpc3mrzx+db+HtTELcrJOBCpHsWxWNaa7caazPZeWt0ePtYjXzE9RFxiP6qAx9aqST6XeTGfVNMuL6dvvyyX0pdvqTmpagnrqZOlQT9+8mbJGsNy+nWS+0mqwj/2anJFffx2ugr/ANdNaiH8mrIji8IH/WeG77/gGon+qVp6DoXhDWtRWxtdB1NJWVmG/UlC4Ayf4KaVN6JFRp4WTsof195P+/U/NF4WH11cH+RpyzMO3hH8dTP+NbP/AArLQe+k3Y+mqr/8bqvL4B8JxSmKW0uUkBAKnVkyM4xx5fuPzq/Zx7G6w1H/AJ9/195SE5/6lAf9xE/416L+zY7WHjy+uLS30a5lGly/LYXTTSAb052/3f8A61cMngPwg0YkW3uSh/iGqpjpn/nn6Amu9+CMPhf4feLbnXIfPgZrGS3y96Js5ZDjaEBz8vWoq1I0abm1ojooUU5KEItX/rues3ug33jWYDW5ZrS435hbLOuwdvLOFU++c0Vj6n8W7a/vNuleH9QvrheUYKEBP4n+lFcH9v1vsQSR3xyCMleTdzwKobsr9mcN0OB+Zqb8aoa9k6Rc7D8wUMPwINeHhtK0PVfmfrmZa4Oql/LL8mcT4oVmuiqD5t6j8cVYtxABicPn1WteF9CuIVuLoXMk7jLBJlTafTBX+tDr4ezgpfqfQzxGvrZQk9j8MqUZy0Rn/Z7Vx+6uBn0biqNmq2XiCMzkrEJVLMBn5T3rbaLQA2He9X2Z4h/Wlki8OSrs3T9MDDRk/wDoVOnBp6lYejOnK7Fmi01JmWPULeVMna211yPcEcVHJHb4HlXdn7kygVVudMSMn7HeXP8AuSxKf1DVTa11AdUib8cU/ZR3L+qwvcvsgHS7t2/3ZUptpc6tY3wu9M1a3t5FUqG3RkgHqOtZ0ltelCDFEARjO8VSGiXRGRsP/AhVKKRoqUYvQ7EeJfGx6eJ4Pyipf+Eh8ann/hJrY/hF/hXHLol6M/KvTH3hSf2Heei/mKouz7nZ/wBv+Nsf8jNbflF/hXd/A+38QeK/GMun63fx6raw2b3HkxhMghlG75cHABP514n/AGHelQuF4Oeor1/9kXTrS3+KFx/a1y0FvLpcsfmRtgqxkjx+HFcOZO2FqN9jowt1WjbufWfhnw14XjsI5E0u3jkj4YqMMPxoqbUtOu7KIWlmz3lpIMrKp5H1NFfAvG11oqZ9Koxlq2fGTE1Bc/vInjYHa6lT+NXKOPQV60Z2dz9BnR5002ebajZX9vM0cUMjp2ZQcGqZGoAndbyE+616oVU9VH5UwxRHrGh/CvXjnMraxPkZ8G0m7xqNfI8vhWdpP38G1O+E5qz+6XpA34rXoptrc9YI/wDvkUhs7U9beL/vkUPN+beP4ihwlyLSafqjzndg/LGR/wABqNyzdQfxFekGxsz/AMu0X/fNIdPsT/y6xf8AfNCzWP8AKwfClT+dfcealP8AZ/SmlP8AY/SvS/7NsP8An0i/75pP7MsP+fSL/vmqWbQ/lZD4Tqv7aPMzF/sj8qb5Xbb+lenf2Zp//PpF+VH9l6f/AM+kX/fNP+149mT/AKo1f50eZCM/3f0r1r9la0luviPeRxxK5Gkyna3Gfnjql/Zen/8APpF+Vejfs+QQWPja5ltbLMjafIp8vg43pWGJzClXpSpzTSZMuG62EXt1JPl1PXtP1TVdElaGGSR4P+WlrNzge3pRWxrcsMmnnzrZGXGdxkAZT9fWivmJQnTfLTndeZlGrGeso6nyfRRRXoH6CFFFFABRRRQAUUUUAFFFFABRRRQAlb/gbxLpXh3VpZ9QN2DJAY1MCE4yQeSCPSiivRy3BU8bV9lVva3Q+e4mxlTC4Jyp9Wkei6f8R/DZQoLmUhv+fpXUj6HBooor0KmQYaDtFyt6/wDAPzuOY1mrux//2Q==" style="width:48px;height:48px;object-fit:cover;border-radius:8px;flex-shrink:0;">
     <div style="flex:1">
       <div class="commute-route">Vestliveien 20B → Haslum skole → Innspurten 15</div>
       <div id="commute-tip" class="commute-tip hidden"></div>
@@ -504,23 +506,27 @@ body.night-mode .wake-btn { display: block; }
 
   <!-- WEATHER – full width -->
   <div class="weather-card" id="weather-card">
-    <div class="weather-top">
-      <div class="weather-loc" id="weather-loc">Haslum</div>
-      <div class="weather-temp" id="w-temp">–°</div>
-      <div class="weather-desc" id="w-desc">Henter…</div>
-      <div class="weather-meta">
-        <span id="w-wind">–</span>
-        <span id="w-rain">–</span>
-        <span id="w-feels">–</span>
+    <div class="weather-inner">
+      <div class="weather-left">
+        <div class="weather-loc" id="weather-loc">Haslum</div>
+        <div class="weather-temp" id="w-temp">–°</div>
+        <div class="weather-desc" id="w-desc">Henter…</div>
+        <div class="weather-meta">
+          <span id="w-wind">–</span>
+          <span id="w-rain">–</span>
+          <span id="w-feels">–</span>
+        </div>
+        <div class="hourly">
+          <div class="hourly-title">Time for time</div>
+          <div id="hourly-body"></div>
+        </div>
       </div>
-    </div>
-    <div class="hourly">
-      <div class="hourly-title">Time for time i dag</div>
-      <div id="hourly-body"></div>
-    </div>
-    <div class="forecast">
-      <div class="forecast-title">5-dagers varsel</div>
-      <div id="forecast-body"></div>
+      <div class="weather-right">
+        <div class="forecast">
+          <div class="forecast-title">5-dagers varsel</div>
+          <div id="forecast-body"></div>
+        </div>
+      </div>
     </div>
   </div>
 
