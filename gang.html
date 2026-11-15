@@ -15,11 +15,11 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family
 button{font-family:inherit}
 .app{height:100vh;height:100dvh;padding:3.4vw;display:flex;flex-direction:column;gap:3.4vw;overflow:hidden}
 .kort{border-radius:7.3vw;padding:5.3vw}
-.klokke{background:var(--gul);display:flex;flex-direction:column;gap:1vw}
+.klokke{flex-shrink:0;background:var(--gul);display:flex;flex-direction:column;gap:1vw}
 .hilsen{font-size:4.2vw;font-weight:800}
-.tid{font-size:25vw;font-weight:900;line-height:.95;letter-spacing:-.03em}
+.tid{font-size:min(25vw,11vh);font-weight:900;line-height:.95;letter-spacing:-.03em}
 .dato{font-size:4.9vw;font-weight:800}
-.port{flex:1;display:flex;flex-direction:column;justify-content:space-between;background:var(--ukjent);transition:background .4s;min-height:0}
+.port{flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:2.5vw;background:var(--ukjent);transition:background .4s;min-height:0}
 .port[data-fase="lukket"]{background:var(--lukket)}
 .port[data-fase="apen"]{background:var(--apen)}
 .port[data-fase="apner"],.port[data-fase="lukker"]{background:var(--gar)}
@@ -29,8 +29,8 @@ button{font-family:inherit}
 .siden{font-size:4.1vw;font-weight:700;padding-top:1.5vw;text-align:right}
 .feil{display:none;margin-top:2vw;font-size:3.6vw;font-weight:800;background:rgba(255,255,255,.7);border-radius:3vw;padding:1.5vw 3vw}
 .feil.vis{display:inline-block}
-.garasje{display:flex;justify-content:center}
-.hus{position:relative;width:68vw;aspect-ratio:280/180}
+.garasje{flex:1;min-height:0;display:flex;justify-content:center;align-items:center}
+.hus{position:relative;height:100%;max-height:43.7vw;max-width:68vw;aspect-ratio:280/180}
 .hus svg{position:absolute;inset:0;width:100%;height:100%}
 .dor{position:absolute;left:25.71%;top:47.78%;width:48.57%;height:50%;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.55) 0,rgba(255,255,255,.55) 3.4vw,var(--ink) 3.4vw,var(--ink) 4.1vw);border:1vw solid var(--ink);border-top:0;transition:height 19s linear}
 .ingen-anim .dor,.ingen-anim .port{transition:none}
@@ -41,7 +41,7 @@ button{font-family:inherit}
 .apne{background:var(--ink);color:#fff}
 .lukk{background:rgba(255,255,255,.6);color:var(--ink);border:.75vw solid var(--ink)}
 .knapp:disabled{opacity:.35;cursor:default}
-.bunn{display:grid;grid-template-columns:1fr 1fr;gap:3.4vw;height:36vw}
+.bunn{display:grid;grid-template-columns:1fr 1fr;gap:3.4vw;height:min(36vw,17vh);flex-shrink:0}
 .liten{display:flex;flex-direction:column;justify-content:space-between;padding:4.4vw 4.9vw}
 .vaer{background:var(--bla)}
 .kal{background:var(--rosa)}
