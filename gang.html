@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Gangpanel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1B1B2F;--bg:#FFFDF8;--gul:#FFE27A;--bla:#C6E3FF;--rosa:#FFD5DC;--lukket:#9EE6C0;--apen:#FF9A4D;--gar:#A9D4FF;--ukjent:#E4E4EA}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit}
+.app{height:100vh;height:100dvh;padding:3.4vw;display:flex;flex-direction:column;gap:3.4vw;overflow:hidden}
+.kort{border-radius:7.3vw;padding:5.3vw}
+.klokke{background:var(--gul);display:flex;flex-direction:column;gap:1vw}
+.hilsen{font-size:4.2vw;font-weight:800}
+.tid{font-size:25vw;font-weight:900;line-height:.95;letter-spacing:-.03em}
+.dato{font-size:4.9vw;font-weight:800}
+.port{flex:1;display:flex;flex-direction:column;justify-content:space-between;background:var(--ukjent);transition:background .4s;min-height:0}
+.port[data-fase="lukket"]{background:var(--lukket)}
+.port[data-fase="apen"]{background:var(--apen)}
+.port[data-fase="apner"],.port[data-fase="lukker"]{background:var(--gar)}
+.porttopp{display:flex;justify-content:space-between;align-items:flex-start;gap:3vw}
+.portnavn{font-size:4.4vw;font-weight:800}
+.status{font-size:11.2vw;font-weight:900;line-height:1}
+.siden{font-size:4.1vw;font-weight:700;padding-top:1.5vw;text-align:right}
+.feil{display:none;margin-top:2vw;font-size:3.6vw;font-weight:800;background:rgba(255,255,255,.7);border-radius:3vw;padding:1.5vw 3vw}
+.feil.vis{display:inline-block}
+.garasje{display:flex;justify-content:center}
+.hus{position:relative;width:68vw;aspect-ratio:280/180}
+.hus svg{position:absolute;inset:0;width:100%;height:100%}
+.dor{position:absolute;left:25.71%;top:47.78%;width:48.57%;height:50%;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.55) 0,rgba(255,255,255,.55) 3.4vw,var(--ink) 3.4vw,var(--ink) 4.1vw);border:1vw solid var(--ink);border-top:0;transition:height 19s linear}
+.ingen-anim .dor,.ingen-anim .port{transition:none}
+.dorlist{position:absolute;left:23.57%;top:45%;width:52.86%;height:3.33%;border-radius:1vw;background:var(--ink)}
+.knapper{display:grid;grid-template-columns:1fr 1fr;gap:2.9vw}
+.knapp{border:0;border-radius:5.3vw;min-height:18.4vw;font-size:5.3vw;font-weight:900;display:flex;align-items:center;justify-content:center;gap:2vw;cursor:pointer}
+.knapp svg{width:6.3vw;height:6.3vw}
+.apne{background:var(--ink);color:#fff}
+.lukk{background:rgba(255,255,255,.6);color:var(--ink);border:.75vw solid var(--ink)}
+.knapp:disabled{opacity:.35;cursor:default}
+.bunn{display:grid;grid-template-columns:1fr 1fr;gap:3.4vw;height:36vw}
+.liten{display:flex;flex-direction:column;justify-content:space-between;padding:4.4vw 4.9vw}
+.vaer{background:var(--bla)}
+.kal{background:var(--rosa)}
+.etikett{font-size:3.9vw;font-weight:800}
+.temp{font-size:12.6vw;font-weight:900;line-height:1}
+.hendelse{font-size:4.9vw;font-weight:900;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.naar{font-size:3.6vw;font-weight:700}
+/* Oppsett */
+.oppsett{position:fixed;inset:0;background:var(--bg);overflow:auto;padding:6vw;display:none;-webkit-user-select:text;user-select:text}
+.oppsett.vis{display:block}
+.oppsett h1{font-size:7vw;margin:0 0 4vw}
+.oppsett label{display:block;font-size:4vw;font-weight:800;margin:4vw 0 1.5vw}
+.oppsett input[type=text],.oppsett input[type=password],.oppsett select{width:100%;font:inherit;font-size:4vw;padding:3vw;border-radius:3vw;border:.5vw solid #C9C9D6;background:#fff;color:var(--ink)}
+.oppsett .rad{display:flex;align-items:center;gap:3vw;margin-top:4vw;font-size:4vw;font-weight:700}
+.oppsett .rad input{width:6vw;height:6vw}
+.oppsett .hjelp{font-size:3.5vw;font-weight:600;color:#4A4A60;margin-top:1.5vw}
+.oppsett .handling{margin-top:6vw;display:flex;gap:3vw;flex-wrap:wrap}
+.oppsett button{border:0;border-radius:4vw;padding:4vw 6vw;font-size:4.4vw;font-weight:900;background:var(--ink);color:#fff;cursor:pointer}
+.oppsett button.sekundar{background:#E4E4EA;color:var(--ink)}
+.oppsett .melding{margin-top:4vw;font-size:4vw;font-weight:700}
+.skjult{display:none}
+</style>
+</head>
+<body>
+<main class="app ingen-anim" id="app">
+<section class="kort klokke" id="klokke" aria-label="Klokke">
+<span class="hilsen" id="hilsen">&nbsp;</span>
+<span class="tid" id="tid">--:--</span>
+<span class="dato" id="dato">&nbsp;</span>
+</section>
+<section class="kort port" id="port" data-fase="ukjent" aria-label="Garasjeport">
+<div>
+<div class="porttopp">
+<div>
+<div class="portnavn">Garasjeporten</div>
+<div class="status" id="status">Henter …</div>
+</div>
+<div class="siden" id="siden"></div>
+</div>
+<div class="feil" id="feil" role="status"></div>
+</div>
+<div class="garasje">
+<div class="hus">
+<svg viewBox="0 0 280 180" aria-hidden="true">
+<path d="M12 72 L140 16 L268 72" fill="none" stroke="#1B1B2F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M38 64 V176 H242 V64" fill="none" stroke="#1B1B2F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect id="inne" x="72" y="86" width="136" height="90" fill="rgba(27,27,47,0.15)"/>
+</svg>
+<div class="dor" id="dor"></div>
+<div class="dorlist"></div>
+</div>
+</div>
+<div class="knapper">
+<button type="button" class="knapp apne" id="knappApne" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>Åpne</button>
+<button type="button" class="knapp lukk" id="knappLukk" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>Lukk</button>
+</div>
+</section>
+<div class="bunn">
+<section class="kort liten vaer" aria-label="Vær ute">
+<span class="etikett" id="vaerTekst">Ute</span>
+<span class="temp" id="temp">--°</span>
+</section>
+<section class="kort liten kal" aria-label="Neste i kalenderen">
+<span class="etikett">Neste</span>
+<div>
+<div class="hendelse" id="hendelse">–</div>
+<div class="naar" id="naar"></div>
+</div>
+</section>
+</div>
+</main>
+
+<section class="oppsett" id="oppsett" aria-label="Oppsett">
+<h1>Oppsett av gangpanel</h1>
+<label for="fAdresse">Homey-adresse</label>
+<input type="text" id="fAdresse" placeholder="https://192-168-10-XX.homey.homeylocal.com" autocomplete="off" spellcheck="false">
+<div class="hjelp">Homeys IP-adresse med bindestreker i stedet for punktum.</div>
+<label for="fNokkel">Homey API-nøkkel</label>
+<input type="password" id="fNokkel" autocomplete="off" spellcheck="false">
+<div class="handling"><button type="button" id="kobleTil">Koble til Homey</button></div>
+<div class="melding" id="oppsettMelding"></div>
+<div id="valg" class="skjult">
+<label for="fEnhet">Portsensor (enhet)</label>
+<select id="fEnhet"></select>
+<label for="fCap">Verdi på sensoren</label>
+<select id="fCap"></select>
+<div class="rad"><input type="checkbox" id="fPaErLukket" checked><span>Sensoren viser «På» når porten er lukket</span></div>
+<label for="fFlow">Flow som åpner/lukker porten</label>
+<select id="fFlow"></select>
+<div class="hjelp">Homey-nøkkelen lagres bare på denne enheten, aldri i koden.</div>
+<div class="handling">
+<button type="button" id="lagre">Lagre og start</button>
+<button type="button" class="sekundar" id="avbryt">Avbryt</button>
+</div>
+</div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  var LAGRING = 'gangpanel.v1';
+  var KJORETID_MS = 19000;
+  var EKSTRA_VENT_MS = 10000;
+  var KALENDER_ID = 'j6icirppgh0fdeb3f9s6p3pfng@group.calendar.google.com';
+  var KALENDER_NOKKEL = 'AIzaSyCZ_pg-OazdOxdkfbF3-1SjnhewkkuprHY'; // samme referrer-begrensede nøkkel som index.html
+  var LAT = 59.919, LON = 10.553;
+
+  var cfg = null;
+  try { cfg = JSON.parse(localStorage.getItem(LAGRING) || 'null'); } catch (e) { cfg = null; }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var fase = null;
+  var sensorLukket = null;
+  var sidenTid = null;
+  var faseTimer = null;
+  var feilTeller = 0;
+  var pollTimer = null;
+
+  // ---------- Klokke ----------
+  function klokke(d) { return d.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' }); }
+  function hilsen(h) {
+    if (h < 5) return 'God natt';
+    if (h < 10) return 'God morgen';
+    if (h < 12) return 'God formiddag';
+    if (h < 18) return 'God ettermiddag';
+    if (h < 23) return 'God kveld';
+    return 'God natt';
+  }
+  function oppdaterKlokke() {
+    var n = new Date();
+    $('tid').textContent = klokke(n);
+    var d = n.toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long' });
+    $('dato').textContent = d.charAt(0).toUpperCase() + d.slice(1);
+    $('hilsen').textContent = hilsen(n.getHours());
+    oppdaterSiden();
+  }
+
+  // ---------- Homey ----------
+  function homey(sti, opts) {
+    opts = opts || {};
+    var adresse = cfg.adresse.replace(/\/+$/, '');
+    return fetch(adresse + '/api/manager/' + sti, {
+      method: opts.method || 'GET',
+      headers: { 'Authorization': 'Bearer ' + cfg.nokkel, 'Content-Type': 'application/json' },
+      body: opts.body
+    }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text().then(function (t) { return t ? JSON.parse(t) : null; });
+    });
+  }
+
+  // ---------- Port: tilstand ----------
+  function settFase(f) { fase = f; tegnPort(); }
+
+  function startBevegelse(retning) {
+    clearTimeout(faseTimer);
+    settFase(retning === 'opp' ? 'apner' : 'lukker');
+    faseTimer = setTimeout(function () {
+      if (retning === 'opp') {
+        settFase(sensorLukket ? 'lukket' : 'apen');
+      } else if (sensorLukket) {
+        settFase('lukket');
+      } else {
+        faseTimer = setTimeout(function () { if (!sensorLukket) settFase('apen'); }, EKSTRA_VENT_MS);
+      }
+    }, KJORETID_MS);
+  }
+
+  function nySensorverdi(lukket, tidspunkt) {
+    if (sensorLukket === null) {
+      sensorLukket = lukket;
+      sidenTid = tidspunkt;
+      settFase(lukket ? 'lukket' : 'apen');
+      requestAnimationFrame(function () { requestAnimationFrame(function () { $('app').classList.remove('ingen-anim'); }); });
+      return;
+    }
+    if (lukket === sensorLukket) return;
+    sensorLukket = lukket;
+    sidenTid = tidspunkt || new Date();
+    if (lukket) {
+      clearTimeout(faseTimer);
+      settFase('lukket');
+    } else if (fase !== 'apner') {
+      startBevegelse('opp');
+    }
+  }
+
+  function tegnPort() {
+    var tekster = { lukket: 'Lukket', apen: 'Åpen', apner: 'Åpner …', lukker: 'Lukker …' };
+    $('port').dataset.fase = fase || 'ukjent';
+    $('status').textContent = tekster[fase] || 'Henter …';
+    var aapen = fase === 'apen' || fase === 'apner';
+    $('dor').style.height = aapen ? '0%' : '50%';
+    $('inne').setAttribute('fill', aapen ? '#1B1B2F' : 'rgba(27,27,47,0.15)');
+    $('knappApne').disabled = fase !== 'lukket';
+    $('knappLukk').disabled = fase !== 'apen';
+    oppdaterSiden();
+  }
+
+  function oppdaterSiden() {
+    var el = $('siden');
+    if (!sidenTid || (fase !== 'lukket' && fase !== 'apen')) { el.textContent = ''; return; }
+    if (fase === 'lukket') { el.textContent = 'siden ' + klokke(sidenTid); return; }
+    var min = Math.max(0, Math.floor((Date.now() - sidenTid.getTime()) / 60000));
+    el.textContent = min < 60 ? 'i ' + min + ' min' : 'siden ' + klokke(sidenTid);
+  }
+
+  function visFeil(tekst) {
+    var el = $('feil');
+    if (tekst) { el.textContent = tekst; el.classList.add('vis'); }
+    else { el.textContent = ''; el.classList.remove('vis'); }
+  }
+
+  function hentSensor() {
+    homey('devices/device/' + encodeURIComponent(cfg.enhet)).then(function (d) {
+      var c = d && d.capabilitiesObj && d.capabilitiesObj[cfg.cap];
+      if (!c) throw new Error('Fant ikke sensorverdien');
+      var paa = !!c.value;
+      var lukket = cfg.paErLukket ? paa : !paa;
+      feilTeller = 0;
+      visFeil('');
+      nySensorverdi(lukket, c.lastUpdated ? new Date(c.lastUpdated) : new Date());
+    }).catch(function () {
+      feilTeller++;
+      if (feilTeller >= 3) visFeil('Mister kontakt med Homey');
+    });
+  }
+
+  function trykk(retning) {
+    if (retning === 'opp' && fase !== 'lukket') return;
+    if (retning === 'ned' && fase !== 'apen') return;
+    var type = cfg.flowType === 'advanced' ? 'advancedflow' : 'flow';
+    $('knappApne').disabled = true;
+    $('knappLukk').disabled = true;
+    homey('flow/' + type + '/' + encodeURIComponent(cfg.flow) + '/trigger', { method: 'POST', body: '{}' })
+      .then(function () { visFeil(''); startBevegelse(retning); })
+      .catch(function () { visFeil('Fikk ikke startet porten'); tegnPort(); });
+  }
+
+  // ---------- Vær (MET / Yr) ----------
+  var symbolTekst = [
+    ['thunder', 'Torden'], ['sleet', 'Sludd'], ['snow', 'Snø'], ['rain', 'Regn'],
+    ['fog', 'Tåke'], ['partlycloudy', 'Delvis skyet'], ['cloudy', 'Overskyet'],
+    ['fair', 'Lettskyet'], ['clearsky', 'Klarvær']
+  ];
+  function hentVaer() {
+    fetch('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=' + LAT + '&lon=' + LON)
+      .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function (j) {
+        var ts = j.properties.timeseries[0].data;
+        var t = ts.instant.details.air_temperature;
+        $('temp').textContent = Math.round(t) + '°';
+        var kode = (ts.next_1_hours && ts.next_1_hours.summary.symbol_code) || '';
+        var tekst = '';
+        for (var i = 0; i < symbolTekst.length; i++) { if (kode.indexOf(symbolTekst[i][0]) !== -1) { tekst = symbolTekst[i][1]; break; } }
+        $('vaerTekst').textContent = tekst ? 'Ute · ' + tekst.toLowerCase() : 'Ute';
+      })
+      .catch(function () { /* beholder forrige verdi */ });
+  }
+
+  // ---------- Kalender ----------
+  function relativDag(start, heldag) {
+    var idag = new Date(); idag.setHours(0, 0, 0, 0);
+    var dag = new Date(start); dag.setHours(0, 0, 0, 0);
+    var diff = Math.round((dag - idag) / 86400000);
+    var kl = heldag ? '' : ' kl. ' + klokke(start);
+    if (diff <= 0) return 'i dag' + kl;
+    if (diff === 1) return 'i morgen' + kl;
+    if (diff < 7) return start.toLocaleDateString('nb-NO', { weekday: 'long' }) + kl;
+    return 'om ' + diff + ' dager';
+  }
+  function hentKalender() {
+    var url = 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(KALENDER_ID) +
+      '/events?singleEvents=true&orderBy=startTime&maxResults=1&timeMin=' + encodeURIComponent(new Date().toISOString()) +
+      '&key=' + encodeURIComponent(KALENDER_NOKKEL);
+    fetch(url)
+      .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function (j) {
+        var e = j.items && j.items[0];
+        if (!e) { $('hendelse').textContent = 'Ingenting planlagt'; $('naar').textContent = ''; return; }
+        var heldag = !!(e.start && e.start.date);
+        var start = new Date(heldag ? e.start.date + 'T00:00:00' : e.start.dateTime);
+        $('hendelse').textContent = e.summary || 'Uten tittel';
+        $('naar').textContent = relativDag(start, heldag);
+      })
+      .catch(function () { /* beholder forrige verdi */ });
+  }
+
+  // ---------- Oppsett ----------
+  var enheter = {};
+  function settMelding(t) { $('oppsettMelding').textContent = t || ''; }
+  function fyllSelect(sel, valg, valgt) {
+    sel.innerHTML = '';
+    valg.forEach(function (v) {
+      var o = document.createElement('option');
+      o.value = v.verdi; o.textContent = v.tekst;
+      if (v.verdi === valgt) o.selected = true;
+      sel.appendChild(o);
+    });
+  }
+  function fyllCap() {
+    var d = enheter[$('fEnhet').value];
+    var caps = [];
+    if (d && d.capabilitiesObj) {
+      Object.keys(d.capabilitiesObj).forEach(function (k) {
+        var c = d.capabilitiesObj[k];
+        if (c && c.type === 'boolean') caps.push({ verdi: k, tekst: (c.title || k) + ' (nå: ' + (c.value ? 'På' : 'Av') + ')' });
+      });
+    }
+    fyllSelect($('fCap'), caps, cfg && cfg.cap);
+  }
+  function aapneOppsett() {
+    $('oppsett').classList.add('vis');
+    if (cfg) { $('fAdresse').value = cfg.adresse || ''; $('fNokkel').value = cfg.nokkel || ''; $('fPaErLukket').checked = cfg.paErLukket !== false; }
+  }
+  $('kobleTil').addEventListener('click', function () {
+    var adresse = $('fAdresse').value.trim();
+    var nokkel = $('fNokkel').value.trim();
+    if (!/^https:\/\//.test(adresse)) { settMelding('Adressen må starte med https://'); return; }
+    cfg = Object.assign({}, cfg || {}, { adresse: adresse, nokkel: nokkel });
+    settMelding('Kobler til …');
+    Promise.all([
+      homey('devices/device'),
+      homey('flow/flow').catch(function () { return {}; }),
+      homey('flow/advancedflow').catch(function () { return {}; })
+    ]).then(function (res) {
+      enheter = res[0] || {};
+      var enhetsvalg = Object.keys(enheter).filter(function (id) {
+        var co = enheter[id].capabilitiesObj || {};
+        return Object.keys(co).some(function (k) { return co[k] && co[k].type === 'boolean'; });
+      }).map(function (id) { return { verdi: id, tekst: enheter[id].name }; })
+        .sort(function (a, b) { return a.tekst.localeCompare(b.tekst, 'nb'); });
+      fyllSelect($('fEnhet'), enhetsvalg, cfg.enhet);
+      fyllCap();
+      var flows = [];
+      Object.keys(res[1] || {}).forEach(function (id) { flows.push({ verdi: 'basic:' + id, tekst: res[1][id].name }); });
+      Object.keys(res[2] || {}).forEach(function (id) { flows.push({ verdi: 'advanced:' + id, tekst: res[2][id].name + ' (avansert)' }); });
+      flows.sort(function (a, b) { return a.tekst.localeCompare(b.tekst, 'nb'); });
+      fyllSelect($('fFlow'), flows, cfg.flow ? (cfg.flowType === 'advanced' ? 'advanced:' : 'basic:') + cfg.flow : null);
+      $('valg').classList.remove('skjult');
+      settMelding(flows.length ? 'Tilkoblet. Velg sensor og flow.' : 'Tilkoblet, men fant ingen flows. Sjekk at nøkkelen kan se flows.');
+    }).catch(function (e) {
+      settMelding('Fikk ikke kontakt med Homey (' + e.message + '). Sjekk adressen, nøkkelen og at enheten er på hjemmenettet.');
+    });
+  });
+  $('fEnhet').addEventListener('change', fyllCap);
+  $('lagre').addEventListener('click', function () {
+    var f = ($('fFlow').value || '').split(':');
+    if (!$('fEnhet').value || !$('fCap').value || f.length < 2) { settMelding('Velg sensor, verdi og flow først.'); return; }
+    cfg = {
+      adresse: $('fAdresse').value.trim(),
+      nokkel: $('fNokkel').value.trim(),
+      enhet: $('fEnhet').value,
+      cap: $('fCap').value,
+      paErLukket: $('fPaErLukket').checked,
+      flowType: f[0],
+      flow: f.slice(1).join(':')
+    };
+    try { localStorage.setItem(LAGRING, JSON.stringify(cfg)); } catch (e) { settMelding('Kunne ikke lagre på enheten.'); return; }
+    location.reload();
+  });
+  $('avbryt').addEventListener('click', function () { if (cfg && cfg.enhet) $('oppsett').classList.remove('vis'); });
+
+  // Hold inne klokken i 3 sekunder for å åpne oppsettet
+  var holdTimer = null;
+  $('klokke').addEventListener('pointerdown', function () { holdTimer = setTimeout(aapneOppsett, 3000); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) {
+    $('klokke').addEventListener(ev, function () { clearTimeout(holdTimer); });
+  });
+
+  $('knappApne').addEventListener('click', function () { trykk('opp'); });
+  $('knappLukk').addEventListener('click', function () { trykk('ned'); });
+
+  // ---------- Start ----------
+  oppdaterKlokke();
+  setInterval(oppdaterKlokke, 10000);
+  hentVaer();
+  setInterval(hentVaer, 15 * 60000);
+
+  if (!cfg || !cfg.enhet || !cfg.flow) {
+    aapneOppsett();
+  } else {
+    hentSensor();
+    pollTimer = setInterval(hentSensor, 2000);
+    hentKalender();
+    setInterval(hentKalender, 10 * 60000);
+  }
+})();
+</script>
+</body>
+</html>
