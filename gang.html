@@ -63,6 +63,8 @@ button{font-family:inherit}
 .oppsett button.sekundar{background:#E4E4EA;color:var(--ink)}
 .oppsett .melding{margin-top:4vw;font-size:4vw;font-weight:700}
 .skjult{display:none}
+.sovn{position:fixed;inset:0;background:#000;z-index:50;display:none}
+.sovn.vis{display:block}
 </style>
 </head>
 <body>
@@ -114,6 +116,8 @@ button{font-family:inherit}
 </div>
 </main>
 
+<div class="sovn" id="sovn" aria-hidden="true"></div>
+
 <section class="oppsett" id="oppsett" aria-label="Oppsett">
 <h1>Oppsett av gangpanel</h1>
 <label for="fAdresse">Homey-adresse</label>
@@ -131,6 +135,23 @@ button{font-family:inherit}
 <div class="rad"><input type="checkbox" id="fPaErLukket" checked><span>Sensoren viser «På» når porten er lukket</span></div>
 <label for="fFlow">Flow som åpner/lukker porten</label>
 <select id="fFlow"></select>
+<label for="fSovn">Skjermen blir svart etter</label>
+<select id="fSovn">
+<option value="30">30 sekunder</option>
+<option value="60" selected>1 minutt</option>
+<option value="120">2 minutter</option>
+<option value="300">5 minutter</option>
+<option value="0">Aldri</option>
+</select>
+<div class="hjelp">Svart skjerm er nesten like strømsparende som avslått på denne skjermen, og hindrer innbrenning. Trykk hvor som helst for å vekke den. Den våkner også når porten åpnes eller lukkes.</div>
+<div class="rad"><input type="checkbox" id="fKamera"><span>Vekk skjermen ved bevegelse (bruker frontkameraet)</span></div>
+<label for="fFolsomhet">Følsomhet for bevegelse</label>
+<select id="fFolsomhet">
+<option value="0.10">Lav</option>
+<option value="0.06" selected>Middels</option>
+<option value="0.03">Høy</option>
+</select>
+<div class="hjelp">Bildet fra kameraet brukes bare til å oppdage bevegelse på telefonen. Det lagres og sendes ingen steder.</div>
 <div class="hjelp">Homey-nøkkelen lagres bare på denne enheten, aldri i koden.</div>
 <div class="handling">
 <button type="button" id="lagre">Lagre og start</button>
@@ -219,6 +240,7 @@ button{font-family:inherit}
       return;
     }
     if (lukket === sensorLukket) return;
+    vekk();
     sensorLukket = lukket;
     sidenTid = tidspunkt || new Date();
     if (lukket) {
@@ -355,6 +377,11 @@ button{font-family:inherit}
   }
   function aapneOppsett() {
     $('oppsett').classList.add('vis');
+    if (cfg) {
+      if (cfg.sovnSek !== undefined) $('fSovn').value = String(cfg.sovnSek);
+      $('fKamera').checked = !!cfg.kamera;
+      if (cfg.folsomhet) $('fFolsomhet').value = String(cfg.folsomhet);
+    }
     if (cfg) { $('fAdresse').value = cfg.adresse || ''; $('fNokkel').value = cfg.nokkel || ''; $('fPaErLukket').checked = cfg.paErLukket !== false; }
   }
   $('kobleTil').addEventListener('click', function () {
@@ -398,7 +425,10 @@ button{font-family:inherit}
       cap: $('fCap').value,
       paErLukket: $('fPaErLukket').checked,
       flowType: f[0],
-      flow: f.slice(1).join(':')
+      flow: f.slice(1).join(':'),
+      sovnSek: parseInt($('fSovn').value, 10),
+      kamera: $('fKamera').checked,
+      folsomhet: parseFloat($('fFolsomhet').value)
     };
     try { localStorage.setItem(LAGRING, JSON.stringify(cfg)); } catch (e) { settMelding('Kunne ikke lagre på enheten.'); return; }
     location.reload();
@@ -415,6 +445,76 @@ button{font-family:inherit}
   $('knappApne').addEventListener('click', function () { trykk('opp'); });
   $('knappLukk').addEventListener('click', function () { trykk('ned'); });
 
+  // ---------- Skjermsparer, våkenhet og bevegelse ----------
+  var sistAktiv = Date.now();
+  var ignorerBevegelseTil = 0;
+  var wakeLock = null;
+
+  function sover() { return $('sovn').classList.contains('vis'); }
+  function vekk() {
+    sistAktiv = Date.now();
+    if (sover()) {
+      $('sovn').classList.remove('vis');
+      ignorerBevegelseTil = Date.now() + 2500;
+      oppdaterKlokke();
+      if (cfg && cfg.enhet) hentSensor();
+    }
+  }
+  function sjekkSovn() {
+    if (!cfg || !cfg.enhet || !cfg.sovnSek) return;
+    if ($('oppsett').classList.contains('vis')) return;
+    if (fase === 'apner' || fase === 'lukker') { sistAktiv = Date.now(); return; }
+    if (!sover() && Date.now() - sistAktiv > cfg.sovnSek * 1000) {
+      $('sovn').classList.add('vis');
+      ignorerBevegelseTil = Date.now() + 2500;
+    }
+  }
+  function holdSkjermenVaaken() {
+    if (!('wakeLock' in navigator) || wakeLock) return;
+    navigator.wakeLock.request('screen').then(function (l) {
+      wakeLock = l;
+      l.addEventListener('release', function () { wakeLock = null; });
+    }).catch(function () { /* prøver igjen ved neste trykk */ });
+  }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') holdSkjermenVaaken(); });
+  document.addEventListener('pointerdown', function () { sistAktiv = Date.now(); holdSkjermenVaaken(); }, true);
+  $('sovn').addEventListener('pointerdown', function (e) { e.preventDefault(); e.stopPropagation(); vekk(); });
+  $('sovn').addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); });
+
+  function bevegelse() {
+    if (Date.now() < ignorerBevegelseTil) return;
+    if (sover()) vekk(); else sistAktiv = Date.now();
+  }
+  function startKamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 160 }, height: { ideal: 120 }, frameRate: { ideal: 5 } }, audio: false })
+      .then(function (strom) {
+        var v = document.createElement('video');
+        v.muted = true; v.setAttribute('playsinline', ''); v.srcObject = strom;
+        return v.play().then(function () {
+          var B = 40, H = 30, N = B * H;
+          var c = document.createElement('canvas'); c.width = B; c.height = H;
+          var ctx = c.getContext('2d', { willReadFrequently: true });
+          var forrige = null;
+          var terskel = (cfg.folsomhet || 0.06) * N;
+          setInterval(function () {
+            if (v.readyState < 2) return;
+            ctx.drawImage(v, 0, 0, B, H);
+            var d = ctx.getImageData(0, 0, B, H).data;
+            var naa = new Uint8Array(N);
+            for (var i = 0; i < N; i++) naa[i] = (d[i * 4] * 3 + d[i * 4 + 1] * 6 + d[i * 4 + 2]) / 10;
+            if (forrige && Date.now() >= ignorerBevegelseTil) {
+              var endret = 0;
+              for (var j = 0; j < N; j++) if (Math.abs(naa[j] - forrige[j]) > 25) endret++;
+              if (endret > terskel) bevegelse();
+            }
+            forrige = naa;
+          }, 400);
+        });
+      })
+      .catch(function () { visFeil('Fikk ikke tilgang til kameraet'); setTimeout(function () { visFeil(''); }, 8000); });
+  }
+
   // ---------- Start ----------
   oppdaterKlokke();
   setInterval(oppdaterKlokke, 10000);
@@ -428,6 +528,10 @@ button{font-family:inherit}
     pollTimer = setInterval(hentSensor, 2000);
     hentKalender();
     setInterval(hentKalender, 10 * 60000);
+    holdSkjermenVaaken();
+    setInterval(sjekkSovn, 1000);
+    if (cfg.sovnSek === undefined) cfg.sovnSek = 60;
+    if (cfg.kamera) startKamera();
   }
 })();
 </script>
