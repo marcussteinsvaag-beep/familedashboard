@@ -49,6 +49,40 @@ button{font-family:inherit}
 .temp{font-size:12.6vw;font-weight:900;line-height:1}
 .hendelse{font-size:4.9vw;font-weight:900;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .naar{font-size:3.6vw;font-weight:700}
+/* Detaljer */
+.liten{cursor:pointer}
+.mer{opacity:.55;margin-left:1vw}
+.detalj{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;padding:3.4vw;gap:3.4vw;background:var(--bg);transform:translateY(100%);transition:transform .35s ease;visibility:hidden}
+.detalj.vis{transform:none;visibility:visible}
+.dhode{border-radius:7.3vw;padding:5.3vw;display:flex;justify-content:space-between;align-items:flex-start;gap:3vw;flex-shrink:0}
+.dvaer .dhode{background:var(--bla)}
+.dkal .dhode{background:var(--rosa)}
+.dtittel{font-size:4.4vw;font-weight:800}
+.dstor{font-size:min(22vw,10vh);font-weight:900;line-height:1;margin-top:1.5vw}
+.dsub{font-size:4.4vw;font-weight:800;margin-top:1.5vw}
+.lukkx{border:0;border-radius:5vw;background:var(--ink);color:#fff;font-size:4.4vw;font-weight:900;padding:3.4vw 5vw;cursor:pointer;flex-shrink:0}
+.dkropp{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:3.4vw;-webkit-overflow-scrolling:touch}
+.dblokk{border-radius:7.3vw;padding:4.4vw 5.3vw;background:#fff;border:.6vw solid #EDE7DA}
+.dblokk h2{font-size:4.2vw;font-weight:900;margin:0 0 2.5vw}
+.timer{display:flex;gap:2.5vw;overflow-x:auto;padding-bottom:1vw}
+.time{flex:0 0 auto;min-width:14vw;text-align:center;background:var(--bla);border-radius:4vw;padding:2.5vw 1.5vw}
+.time .kl{font-size:3.4vw;font-weight:800}
+.ikon{font-size:7vw;line-height:1.3}
+.time .t{font-size:4.6vw;font-weight:900}
+.time .nb{font-size:3vw;font-weight:800;color:#1E5FA8;min-height:3.6vw}
+.dag{display:grid;grid-template-columns:22vw 10vw 1fr auto;align-items:center;gap:2.5vw;padding:2.2vw 0;border-top:.4vw solid #F1ECE2;font-size:4.4vw;font-weight:800}
+.dag:first-of-type{border-top:0}
+.dag .ikon{font-size:6.5vw}
+.dag .mm{font-size:3.6vw;color:#1E5FA8}
+.dag .mx{font-weight:900}
+.dag .mn{opacity:.55;margin-left:1.5vw}
+.kdag h2{text-transform:none}
+.ev{display:grid;grid-template-columns:17vw 1fr;gap:2.5vw;padding:2.2vw 0;border-top:.4vw solid #F1ECE2;align-items:baseline}
+.ev:first-of-type{border-top:0}
+.ev .kl{font-size:4vw;font-weight:900}
+.ev .tt{font-size:4.6vw;font-weight:800;line-height:1.2}
+.ev .st{font-size:3.6vw;font-weight:700;opacity:.65;margin-top:.5vw}
+.tom{font-size:4.4vw;font-weight:800;opacity:.6;padding:2vw 0}
 /* Oppsett */
 .oppsett{position:fixed;inset:0;background:var(--bg);overflow:auto;padding:6vw;display:none;-webkit-user-select:text;user-select:text}
 .oppsett.vis{display:block}
@@ -102,12 +136,12 @@ button{font-family:inherit}
 </div>
 </section>
 <div class="bunn">
-<section class="kort liten vaer" aria-label="Vær ute">
-<span class="etikett" id="vaerTekst">Ute</span>
+<section class="kort liten vaer" id="vaerKort" role="button" aria-label="Vær ute, trykk for detaljer">
+<span class="etikett"><span id="vaerTekst">Ute</span><span class="mer">›</span></span>
 <span class="temp" id="temp">--°</span>
 </section>
-<section class="kort liten kal" aria-label="Neste i kalenderen">
-<span class="etikett">Neste</span>
+<section class="kort liten kal" id="kalKort" role="button" aria-label="Neste i kalenderen, trykk for flere">
+<span class="etikett">Neste<span class="mer">›</span></span>
 <div>
 <div class="hendelse" id="hendelse">–</div>
 <div class="naar" id="naar"></div>
@@ -115,6 +149,25 @@ button{font-family:inherit}
 </section>
 </div>
 </main>
+
+<section class="detalj dvaer" id="dVaer" aria-label="Værdetaljer">
+<div class="dhode">
+<div><div class="dtittel">Været på Haslum</div><div class="dstor" id="dvTemp">--°</div><div class="dsub" id="dvTekst"></div></div>
+<button type="button" class="lukkx" data-lukk>Lukk</button>
+</div>
+<div class="dkropp">
+<div class="dblokk"><h2>Neste timer</h2><div class="timer" id="dvTimer"></div></div>
+<div class="dblokk"><h2>Neste dager</h2><div id="dvDager"></div></div>
+</div>
+</section>
+
+<section class="detalj dkal" id="dKal" aria-label="Kalender">
+<div class="dhode">
+<div><div class="dtittel">Kalender</div><div class="dsub" id="dkSub">Neste to uker</div></div>
+<button type="button" class="lukkx" data-lukk>Lukk</button>
+</div>
+<div class="dkropp" id="dkListe"></div>
+</section>
 
 <div class="sovn" id="sovn" aria-hidden="true"></div>
 
@@ -240,6 +293,7 @@ button{font-family:inherit}
       return;
     }
     if (lukket === sensorLukket) return;
+    lukkDetaljer();
     vekk();
     sensorLukket = lukket;
     sidenTid = tidspunkt || new Date();
@@ -309,10 +363,13 @@ button{font-family:inherit}
     ['fog', 'Tåke'], ['partlycloudy', 'Delvis skyet'], ['cloudy', 'Overskyet'],
     ['fair', 'Lettskyet'], ['clearsky', 'Klarvær']
   ];
+  var vaerData = null, vaerHentet = 0;
   function hentVaer() {
     fetch('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=' + LAT + '&lon=' + LON)
       .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
       .then(function (j) {
+        vaerData = j; vaerHentet = Date.now();
+        if ($('dVaer').classList.contains('vis')) tegnVaerDetalj();
         var ts = j.properties.timeseries[0].data;
         var t = ts.instant.details.air_temperature;
         $('temp').textContent = Math.round(t) + '°';
@@ -335,13 +392,17 @@ button{font-family:inherit}
     if (diff < 7) return start.toLocaleDateString('nb-NO', { weekday: 'long' }) + kl;
     return 'om ' + diff + ' dager';
   }
+  var kalHendelser = null;
   function hentKalender() {
     var url = 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(KALENDER_ID) +
-      '/events?singleEvents=true&orderBy=startTime&maxResults=1&timeMin=' + encodeURIComponent(new Date().toISOString()) +
+      '/events?singleEvents=true&orderBy=startTime&maxResults=40&timeMin=' + encodeURIComponent(new Date().toISOString()) +
+      '&timeMax=' + encodeURIComponent(new Date(Date.now() + 14 * 86400000).toISOString()) +
       '&key=' + encodeURIComponent(KALENDER_NOKKEL);
     fetch(url)
       .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
       .then(function (j) {
+        kalHendelser = j.items || [];
+        if ($('dKal').classList.contains('vis')) tegnKalDetalj();
         var e = j.items && j.items[0];
         if (!e) { $('hendelse').textContent = 'Ingenting planlagt'; $('naar').textContent = ''; return; }
         var heldag = !!(e.start && e.start.date);
@@ -351,6 +412,132 @@ button{font-family:inherit}
       })
       .catch(function () { /* beholder forrige verdi */ });
   }
+
+  // ---------- Detaljvisninger ----------
+  function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function ikon(kode) {
+    kode = kode || '';
+    var natt = kode.indexOf('_night') !== -1;
+    if (kode.indexOf('thunder') !== -1) return '⛈️';
+    if (kode.indexOf('snow') !== -1 || kode.indexOf('sleet') !== -1) return '🌨️';
+    if (kode.indexOf('rainshowers') !== -1) return natt ? '🌧️' : '🌦️';
+    if (kode.indexOf('rain') !== -1) return '🌧️';
+    if (kode.indexOf('fog') !== -1) return '🌫️';
+    if (kode.indexOf('partlycloudy') === 0) return natt ? '☁️' : '⛅';
+    if (kode.indexOf('cloudy') === 0) return '☁️';
+    if (kode.indexOf('fair') === 0) return natt ? '🌙' : '🌤️';
+    if (kode.indexOf('clearsky') === 0) return natt ? '🌙' : '☀️';
+    return '·';
+  }
+  function tekstFor(kode) {
+    for (var i = 0; i < symbolTekst.length; i++) if ((kode || '').indexOf(symbolTekst[i][0]) !== -1) return symbolTekst[i][1];
+    return '';
+  }
+  function mm(v) { return v.toFixed(1).replace('.', ',') + ' mm'; }
+  function dagNokkel(d) { return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
+  function dagNavn(d) {
+    var idag = new Date(); idag.setHours(0, 0, 0, 0);
+    var x = new Date(d); x.setHours(0, 0, 0, 0);
+    var diff = Math.round((x - idag) / 86400000);
+    if (diff <= 0) return 'I dag';
+    if (diff === 1) return 'I morgen';
+    var n = x.toLocaleDateString('nb-NO', { weekday: 'long' });
+    return n.charAt(0).toUpperCase() + n.slice(1);
+  }
+
+  function tegnVaerDetalj() {
+    if (!vaerData) { $('dvTekst').textContent = 'Henter …'; return; }
+    var serie = vaerData.properties.timeseries;
+    var na = serie[0].data;
+    var kode = (na.next_1_hours && na.next_1_hours.summary.symbol_code) || '';
+    $('dvTemp').textContent = ikon(kode) + ' ' + Math.round(na.instant.details.air_temperature) + '°';
+    var deler = [];
+    if (tekstFor(kode)) deler.push(tekstFor(kode));
+    deler.push('vind ' + Math.round(na.instant.details.wind_speed) + ' m/s');
+    var nbTime = na.next_1_hours && na.next_1_hours.details.precipitation_amount;
+    deler.push(nbTime ? mm(nbTime) + ' neste time' : 'opphold neste time');
+    $('dvTekst').textContent = deler.join(' · ');
+
+    // Neste 12 timer
+    var h = '';
+    for (var i = 1, n = 0; i < serie.length && n < 12; i++) {
+      var s = serie[i];
+      if (!s.data.next_1_hours) break;
+      var t = new Date(s.time);
+      var nb = s.data.next_1_hours.details.precipitation_amount;
+      h += '<div class="time"><div class="kl">' + ('0' + t.getHours()).slice(-2) + '</div><div class="ikon">' + ikon(s.data.next_1_hours.summary.symbol_code) +
+        '</div><div class="t">' + Math.round(s.data.instant.details.air_temperature) + '°</div><div class="nb">' + (nb ? nb.toFixed(1).replace('.', ',') : '') + '</div></div>';
+      n++;
+    }
+    $('dvTimer').innerHTML = h;
+
+    // Neste dager: min/maks, nedbør og symbol midt på dagen
+    var dager = [], idx = {}, dekket = 0;
+    serie.forEach(function (s) {
+      var t = new Date(s.time), k = dagNokkel(t);
+      if (!(k in idx)) { idx[k] = dager.length; dager.push({ dato: t, min: 99, max: -99, nb: 0, kode: '', kodeTime: 99 }); }
+      var d = dager[idx[k]], temp = s.data.instant.details.air_temperature;
+      d.min = Math.min(d.min, temp); d.max = Math.max(d.max, temp);
+      var ms = t.getTime();
+      if (ms >= dekket) {
+        if (s.data.next_1_hours) { d.nb += s.data.next_1_hours.details.precipitation_amount || 0; dekket = ms + 3600000; }
+        else if (s.data.next_6_hours) { d.nb += s.data.next_6_hours.details.precipitation_amount || 0; dekket = ms + 6 * 3600000; }
+      }
+      var sym = s.data.next_6_hours && s.data.next_6_hours.summary.symbol_code;
+      if (sym && Math.abs(t.getHours() - 12) < d.kodeTime) { d.kode = sym; d.kodeTime = Math.abs(t.getHours() - 12); }
+    });
+    $('dvDager').innerHTML = dager.slice(0, 6).map(function (d) {
+      return '<div class="dag"><span>' + dagNavn(d.dato) + '</span><span class="ikon">' + ikon(d.kode) + '</span><span class="mm">' +
+        (d.nb >= 0.1 ? mm(d.nb) : '') + '</span><span><span class="mx">' + Math.round(d.max) + '°</span><span class="mn">' + Math.round(d.min) + '°</span></span></div>';
+    }).join('');
+  }
+
+  function tegnKalDetalj() {
+    if (kalHendelser === null) { $('dkListe').innerHTML = '<div class="dblokk"><div class="tom">Henter …</div></div>'; return; }
+    if (!kalHendelser.length) { $('dkListe').innerHTML = '<div class="dblokk"><div class="tom">Ingenting planlagt de neste to ukene</div></div>'; return; }
+    var grupper = [], idx = {};
+    kalHendelser.forEach(function (e) {
+      var heldag = !!(e.start && e.start.date);
+      var start = new Date(heldag ? e.start.date + 'T00:00:00' : e.start.dateTime);
+      var slutt = e.end ? new Date(e.end.date ? e.end.date + 'T00:00:00' : e.end.dateTime) : null;
+      var visDag = start < new Date() ? new Date() : start; // pågående vises under i dag
+      var k = dagNokkel(visDag);
+      if (!(k in idx)) { idx[k] = grupper.length; grupper.push({ dato: visDag, ev: [] }); }
+      grupper[idx[k]].ev.push({ e: e, heldag: heldag, start: start, slutt: slutt });
+    });
+    $('dkListe').innerHTML = grupper.map(function (g) {
+      var dato = g.dato.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long' });
+      return '<div class="dblokk kdag"><h2>' + dagNavn(g.dato) + ' · ' + dato + '</h2>' + g.ev.map(function (x) {
+        var kl = x.heldag ? 'Hele<br>dagen' : (x.start < new Date() ? 'Nå' : klokke(x.start));
+        var under = [];
+        if (!x.heldag && x.slutt) under.push(klokke(x.start) + '–' + klokke(x.slutt));
+        if (x.e.location) under.push(esc(x.e.location));
+        return '<div class="ev"><div class="kl">' + kl + '</div><div><div class="tt">' + esc(x.e.summary || 'Uten tittel') + '</div>' +
+          (under.length ? '<div class="st">' + under.join(' · ') + '</div>' : '') + '</div></div>';
+      }).join('') + '</div>';
+    }).join('');
+  }
+
+  var detaljTimer = null;
+  function apneDetalj(id) {
+    if (id === 'dVaer') { tegnVaerDetalj(); if (Date.now() - vaerHentet > 10 * 60000) hentVaer(); }
+    else { tegnKalDetalj(); hentKalender(); }
+    $(id).querySelector('.dkropp').scrollTop = 0;
+    $(id).classList.add('vis');
+    restartDetaljTimer();
+  }
+  function lukkDetaljer() {
+    clearTimeout(detaljTimer);
+    $('dVaer').classList.remove('vis'); $('dKal').classList.remove('vis');
+  }
+  function restartDetaljTimer() { clearTimeout(detaljTimer); detaljTimer = setTimeout(lukkDetaljer, 60000); }
+  $('vaerKort').addEventListener('click', function () { apneDetalj('dVaer'); });
+  $('kalKort').addEventListener('click', function () { apneDetalj('dKal'); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-lukk]'), function (b) { b.addEventListener('click', lukkDetaljer); });
+  ['dVaer', 'dKal'].forEach(function (id) {
+    $(id).addEventListener('pointerdown', restartDetaljTimer);
+    $(id).querySelector('.dkropp').addEventListener('scroll', restartDetaljTimer, { passive: true });
+  });
 
   // ---------- Oppsett ----------
   var enheter = {};
@@ -465,6 +652,7 @@ button{font-family:inherit}
     if ($('oppsett').classList.contains('vis')) return;
     if (fase === 'apner' || fase === 'lukker') { sistAktiv = Date.now(); return; }
     if (!sover() && Date.now() - sistAktiv > cfg.sovnSek * 1000) {
+      lukkDetaljer();
       $('sovn').classList.add('vis');
       ignorerBevegelseTil = Date.now() + 2500;
     }
